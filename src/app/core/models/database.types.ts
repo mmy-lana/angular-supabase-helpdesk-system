@@ -19,15 +19,15 @@ export type IconName =
   | 'settings'
   | 'customers';
 
-export interface AttachmentRow {
+export type AttachmentRow = {
   id: string;
   name: string;
   file_path: string;
   size: number;
   mime_type: string;
-}
+};
 
-export interface ProfileRow {
+export type ProfileRow = {
   id: string;
   email: string;
   full_name: string;
@@ -35,9 +35,9 @@ export interface ProfileRow {
   role: UserRole;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface TicketRow {
+export type TicketRow = {
   id: string;
   ticket_number: number;
   requester_id: string;
@@ -51,9 +51,9 @@ export interface TicketRow {
   created_at: string;
   updated_at: string;
   solved_at: string | null;
-}
+};
 
-export interface TicketCommentRow {
+export type TicketCommentRow = {
   id: string;
   ticket_id: string;
   author_id: string;
@@ -61,27 +61,27 @@ export interface TicketCommentRow {
   is_internal: boolean;
   attachments: AttachmentRow[];
   created_at: string;
-}
+};
 
-export interface TicketAuditLogRow {
+export type TicketAuditLogRow = {
   id: string;
   ticket_id: string;
   actor_id: string;
   action: string;
   changes: Record<string, { from: unknown; to: unknown }>;
   created_at: string;
-}
+};
 
 /** Row shape returned by `*, requester:profiles!requester_id(*), assignee:profiles!assignee_id(*)`. */
-export interface TicketWithProfilesRow extends TicketRow {
+export type TicketWithProfilesRow = TicketRow & {
   requester: ProfileRow;
   assignee: ProfileRow | null;
-}
+};
 
 /** Row shape returned by `*, author:profiles!author_id(*)`. */
-export interface TicketCommentWithAuthorRow extends TicketCommentRow {
+export type TicketCommentWithAuthorRow = TicketCommentRow & {
   author: ProfileRow;
-}
+};
 
 /**
  * Structural contract of the `public` schema consumed by `@supabase/supabase-js`.
