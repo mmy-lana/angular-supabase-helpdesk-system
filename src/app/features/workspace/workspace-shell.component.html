@@ -1,0 +1,97 @@
+<div class="shell">
+  @if (!isPhone()) {
+    <app-global-nav-rail
+      [activeItem]="railItem()"
+      (itemSelected)="onRailItem($event)"
+      (accountRequested)="drawerOpen.set(true)"
+      (settingsRequested)="drawerOpen.set(true)" />
+  }
+
+  <div class="shell__main">
+    <app-workspace-header
+      [title]="headerTitle()"
+      [subtitle]="headerSubtitle()"
+      [query]="searchQuery()"
+      [drawerOpen]="drawerOpen()"
+      (searchChanged)="onHeaderSearch($event)"
+      (newTicket)="onNewTicket()"
+      (drawerToggled)="drawerOpen.set(!drawerOpen())" />
+
+    <app-tab-bar
+      [tabs]="tabsState()"
+      [activeTabId]="activeTabId()"
+      (tabSelected)="onTabSelected($event)"
+      (tabClosed)="onTabClosed($event)"
+      (newTicket)="onNewTicket()" />
+
+    <main class="shell__outlet">
+      @switch (activeTab()?.type) {
+        @case ('view') {
+          <app-views-container
+            [viewId]="viewIdOf(activeTabId() ?? '')"
+            [sidebarOpen]="viewsSidebarOpen()"
+            (viewRequested)="openView($event)"
+            (ticketRequested)="openTicket($event)"
+            (sidebarToggled)="viewsSidebarOpen.set(!viewsSidebarOpen())" />
+        }
+        @case ('search') {
+          <app-views-container
+            [viewId]="null"
+            [searchMode]="true"
+            [query]="searchQuery()"
+            [sidebarOpen]="viewsSidebarOpen()"
+            (viewRequested)="openView($event)"
+            (ticketRequested)="openTicket($event)"
+            (sidebarToggled)="viewsSidebarOpen.set(!viewsSidebarOpen())" />
+        }
+        @case ('ticket') {
+          <app-ticket-detail
+            [ticketId]="activeTab()?.ticketId ?? null"
+            [draftKey]="activeTabId() ?? ''"
+            [propertiesOpen]="propertiesOpen()"
+            [contextOpen]="contextOpen()"
+            (propertiesToggled)="propertiesOpen.set(!propertiesOpen())"
+            (contextToggled)="contextOpen.set(!contextOpen())"
+            (ticketRequested)="openTicket($event)" />
+        }
+        @default {
+          <p class="shell__placeholder">Choose a view or a ticket to get started.</p>
+        }
+      }
+    </main>
+
+    @if (isPhone()) {
+      <app-mobile-bottom-nav
+        [activeItem]="dockItem()"
+        (itemSelected)="onDockItem($event)" />
+    }
+  </div>
+</div>
+
+@if (activeTab()?.type === 'new-ticket') {
+  <app-ticket-create-modal
+    [open]="true"
+    [draftKey]="activeTabId() ?? newTicketTabId"
+    (created)="onTicketCreated($event)"
+    (dismissed)="onTabClosed(newTicketTabId)" />
+}
+
+@if (drawerOpen()) {
+  <app-mobile-drawer (closed)="drawerOpen.set(false)" (signedOut)="signOut()" />
+}
+
+@if (pendingCloseTabId(); as tabId) {
+  <div class="shell__scrim" (click)="cancelPendingClose()"></div>
+  <div class="shell__confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+    <h2 class="shell__confirm-title" id="confirm-title">Close this tab?</h2>
+    <p class="shell__confirm-text">The draft you have typed has not been sent yet and will be lost.</p>
+    <div class="shell__confirm-actions">
+      <button type="button" class="shell__confirm-button" (click)="cancelPendingClose()">Keep editing</button>
+      <button type="button" class="shell__confirm-button shell__confirm-button--danger" (click)="confirmPendingClose()">
+        Close and discard
+      </button>
+    </div>
+  </div>
+}
+
+<app-toast-container />

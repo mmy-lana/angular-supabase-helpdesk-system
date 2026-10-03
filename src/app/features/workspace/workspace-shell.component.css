@@ -1,0 +1,97 @@
+.shell {
+  display: flex;
+  height: 100dvh;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background-color: var(--zd-canvas);
+}
+
+.shell__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.shell__outlet {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shell__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  color: var(--zd-text-secondary);
+  text-align: center;
+}
+
+.shell__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--zd-z-overlay);
+  background: rgba(47, 57, 65, 0.45);
+}
+
+.shell__confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--zd-z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(420px, calc(100vw - 32px));
+  padding: 20px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--zd-radius-lg);
+  background-color: var(--zd-surface);
+  box-shadow: var(--zd-shadow-lg);
+}
+
+.shell__confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.shell__confirm-text {
+  color: var(--zd-text-secondary);
+  font-size: 14px;
+}
+
+.shell__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.shell__confirm-button {
+  min-height: var(--zd-touch-target);
+  padding: 0 16px;
+  border: 1px solid var(--zd-border);
+  border-radius: var(--zd-radius-md);
+  color: var(--zd-text-main);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.shell__confirm-button:hover {
+  background-color: var(--zd-surface-sunken);
+}
+
+.shell__confirm-button--danger {
+  border-color: transparent;
+  background-color: var(--zd-danger);
+  color: var(--zd-text-inverse);
+}
+
+.shell__confirm-button--danger:hover {
+  background-color: #ac2733;
+}

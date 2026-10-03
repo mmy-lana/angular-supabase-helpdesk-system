@@ -1,22 +1,31 @@
 import { Routes } from '@angular/router';
+import { anonymousGuard, authGuard } from './core/guards/auth.guard';
 
 export const appRoutes: Routes = [
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
+    canActivate: [anonymousGuard],
+    title: 'Sign in · Help desk',
+    loadComponent: () => import('./features/auth/login.component').then((m) => m.LoginComponent)
   },
   {
     path: 'register',
-    loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent)
+    canActivate: [anonymousGuard],
+    title: 'Create an account · Help desk',
+    loadComponent: () => import('./features/auth/register.component').then((m) => m.RegisterComponent)
   },
   {
     path: 'workspace',
-    loadComponent: () => import('./features/workspace/workspace-shell.component').then(m => m.WorkspaceShellComponent)
+    canActivate: [authGuard],
+    title: 'Workspace · Help desk',
+    loadComponent: () => import('./features/workspace/workspace-shell.component').then(
+      (m) => m.WorkspaceShellComponent
+    )
   },
   {
     path: '',
-    redirectTo: 'workspace',
-    pathMatch: 'full'
+    pathMatch: 'full',
+    redirectTo: 'workspace'
   },
   {
     path: '**',

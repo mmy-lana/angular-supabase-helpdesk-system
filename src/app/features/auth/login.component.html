@@ -1,0 +1,76 @@
+<main class="auth">
+  <section class="auth__card">
+    <header class="auth__header">
+      <span class="auth__mark" aria-hidden="true">HD</span>
+      <h1 class="auth__title">Sign in</h1>
+      <p class="auth__subtitle">Help desk workspace</p>
+    </header>
+
+    @if (misconfigured()) {
+      <p class="auth__error" role="alert">
+        {{ authError() ?? 'This build is not connected to Supabase.' }}
+      </p>
+    }
+
+    <form class="auth__form" (submit)="$event.preventDefault(); submit()">
+      <label class="auth__field">
+        <span class="auth__label">Email address</span>
+        <input
+          type="email"
+          class="auth__input"
+          name="email"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+          [value]="email()"
+          (input)="email.set($any($event.target).value)" />
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Password</span>
+        <input
+          type="password"
+          class="auth__input"
+          name="password"
+          autocomplete="current-password"
+          required
+          [value]="password()"
+          (input)="password.set($any($event.target).value)" />
+      </label>
+
+      @if (errorMessage(); as message) {
+        <p class="auth__error" role="alert">{{ message }}</p>
+      }
+
+      <app-button
+        variant="primary"
+        label="Sign in"
+        icon="lock"
+        [block]="true"
+        [loading]="submitting()"
+        (pressed)="submit()" />
+    </form>
+
+    @if (showDemoAccounts) {
+      <section class="auth__demo">
+        <h2 class="auth__demo-title">Demo accounts</h2>
+        <p class="auth__demo-hint">This build ships with sample identities. Pick one to look around.</p>
+        @for (account of demoAccounts; track account.email) {
+          <button
+            type="button"
+            class="auth__demo-button"
+            [disabled]="demoAccountBusy() !== null"
+            (click)="useDemoAccount(account)">
+            <span class="auth__demo-label">{{ account.label }}</span>
+            <span class="auth__demo-email">{{ account.email }}</span>
+          </button>
+        }
+      </section>
+    }
+
+    <footer class="auth__footer">
+      <a routerLink="/register">Create an account</a>
+    </footer>
+  </section>
+</main>

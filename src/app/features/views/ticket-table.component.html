@@ -1,0 +1,78 @@
+<div class="table-wrap zd-scroll">
+  @if (tickets().length > 0) {
+    <table class="table zd-hide-on-mobile">
+      <thead>
+        <tr>
+          @for (column of columns; track column.field) {
+            <th scope="col" [class]="column.className" [attr.aria-sort]="ariaSortFor(column.field)">
+              <button type="button" class="table__sort" (click)="sortChanged.emit(column.field)">
+                {{ column.label }}
+                <app-icon name="chevron-down" [size]="14" />
+              </button>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (ticket of tickets(); track ticket.id) {
+          <tr class="table__row" (click)="ticketSelected.emit(ticket.id)" (keydown.enter)="ticketSelected.emit(ticket.id)" tabindex="0">
+            <td class="col-number">#{{ ticket.ticketNumber }}</td>
+            <td class="col-subject">
+              <span class="table__subject zd-truncate">{{ ticket.subject }}</span>
+              <span class="table__meta">
+                {{ requesterName(ticket) }}
+                @if (ticket.tags.length > 0) {
+                  <span class="table__tags">
+                    @for (tag of ticket.tags; track tag) {
+                      <span class="table__tag">{{ tag }}</span>
+                    }
+                  </span>
+                }
+              </span>
+            </td>
+            <td class="col-status"><app-badge kind="status" [value]="ticket.status" /></td>
+            <td class="col-priority"><app-badge kind="priority" [value]="ticket.priority" /></td>
+            <td class="col-type">{{ ticket.type }}</td>
+            <td class="col-updated">
+              <span class="table__assignee zd-truncate">{{ assigneeName(ticket) }}</span>
+              <time [attr.datetime]="ticket.updatedAt">{{ ticket.updatedAt | timeAgo }}</time>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <ul class="cards zd-hide-on-desktop">
+      @for (ticket of tickets(); track ticket.id) {
+        <li>
+          <button type="button" class="cards__item" (click)="ticketSelected.emit(ticket.id)">
+            <span class="cards__top">
+              <app-badge kind="status" [value]="ticket.status" />
+              <app-badge kind="priority" [value]="ticket.priority" />
+              <span class="cards__number">#{{ ticket.ticketNumber }}</span>
+            </span>
+            <span class="cards__subject">{{ ticket.subject }}</span>
+            <span class="cards__meta">
+              <span class="zd-truncate">{{ requesterName(ticket) }}</span>
+              <time [attr.datetime]="ticket.updatedAt">{{ ticket.updatedAt | timeAgo }}</time>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+
+    @if (hasMore()) {
+      <div class="table__more">
+        <app-button variant="secondary" label="Load more tickets" [loading]="loading()" (pressed)="loadMore.emit()" />
+      </div>
+    }
+  } @else if (loading()) {
+    <p class="table__state">Loading tickets…</p>
+  } @else {
+    <div class="table__state table__state--empty">
+      <app-icon name="ticket" [size]="28" />
+      <p class="table__state-title">{{ emptyMessage() }}</p>
+      <p class="table__state-hint">{{ emptyHint() }}</p>
+    </div>
+  }
+</div>

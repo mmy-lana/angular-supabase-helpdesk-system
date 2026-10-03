@@ -1,0 +1,55 @@
+<div class="views-layout">
+  <aside class="views-sidebar" [class.views-sidebar--open]="sidebarOpen()">
+    <app-view-sidebar
+      [views]="views"
+      [counts]="counts()"
+      [activeView]="activeViewForSidebar()"
+      [dismissible]="true"
+      (viewSelected)="selectView($event)"
+      (dismissed)="sidebarToggled.emit()" />
+  </aside>
+
+  @if (sidebarOpen()) {
+    <div class="views-layout__overlay" (click)="sidebarToggled.emit()"></div>
+  }
+
+  <section class="views-main">
+    <header class="views-main__header">
+      <button
+        type="button"
+        class="views-main__toggle zd-hide-on-wide-desktop"
+        aria-label="Show views"
+        [attr.aria-expanded]="sidebarOpen()"
+        (click)="sidebarToggled.emit()">
+        <app-icon name="table" [size]="20" />
+      </button>
+
+      <h2 class="views-main__heading zd-truncate">{{ heading() }}</h2>
+
+      <span class="views-main__total">{{ shownTickets().length }} shown</span>
+
+      <button type="button" class="views-main__refresh" aria-label="Refresh tickets" (click)="refresh()">
+        <app-icon name="check" [size]="18" />
+      </button>
+    </header>
+
+    @if (error(); as message) {
+      <p class="views-main__error" role="alert">{{ message }}</p>
+    }
+
+    <app-ticket-table
+      [tickets]="shownTickets()"
+      [sort]="sort()"
+      [loading]="loadState() === 'loading'"
+      [hasMore]="hasMore() && !isSearching()"
+      [emptyMessage]="isSearching() ? 'Nothing matched that search.' : 'No tickets in this view yet.'"
+      [emptyHint]="
+        isSearching()
+          ? 'Try a shorter phrase, or search by tag.'
+          : 'Tickets appear here as soon as somebody raises one.'
+      "
+      (sortChanged)="onSortChanged($event)"
+      (ticketSelected)="ticketRequested.emit($event)"
+      (loadMore)="store.loadMore()" />
+  </section>
+</div>

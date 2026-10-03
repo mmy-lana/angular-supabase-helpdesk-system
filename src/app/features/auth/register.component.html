@@ -1,0 +1,70 @@
+<main class="auth">
+  <section class="auth__card">
+    <header class="auth__header">
+      <span class="auth__mark" aria-hidden="true">HD</span>
+      <h1 class="auth__title">Create an account</h1>
+      <p class="auth__subtitle">New accounts start as customers. Ask an administrator for agent access.</p>
+    </header>
+
+    <form class="auth__form" (submit)="$event.preventDefault(); submit()">
+      <label class="auth__field">
+        <span class="auth__label">Full name</span>
+        <input
+          type="text"
+          class="auth__input"
+          name="fullName"
+          autocomplete="name"
+          required
+          [value]="fullName()"
+          (input)="fullName.set($any($event.target).value)" />
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Email address</span>
+        <input
+          type="email"
+          class="auth__input"
+          name="email"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+          [value]="email()"
+          (input)="email.set($any($event.target).value)" />
+      </label>
+
+      <label class="auth__field">
+        <span class="auth__label">Password</span>
+        <input
+          type="password"
+          class="auth__input"
+          name="password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+          [value]="password()"
+          (input)="password.set($any($event.target).value)" />
+      </label>
+
+      @if (errorMessage(); as message) {
+        <p class="auth__error" role="alert">{{ message }}</p>
+      }
+
+      @if (confirmationMessage(); as message) {
+        <p class="auth__confirmation" role="status">{{ message }}</p>
+      }
+
+      <app-button
+        variant="primary"
+        label="Create account"
+        icon="check"
+        [block]="true"
+        [loading]="submitting()"
+        (pressed)="submit()" />
+    </form>
+
+    <footer class="auth__footer">
+      <a routerLink="/login">Back to sign in</a>
+    </footer>
+  </section>
+</main>

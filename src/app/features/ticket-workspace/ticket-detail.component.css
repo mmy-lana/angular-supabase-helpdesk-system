@@ -1,0 +1,200 @@
+.detail {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--zd-canvas);
+}
+
+.detail__properties,
+.detail__context {
+  display: none;
+  flex: 0 0 auto;
+  border-right: 1px solid var(--zd-border);
+}
+
+.detail__context {
+  border-right: 0;
+  border-left: 1px solid var(--zd-border);
+}
+
+.detail__conversation {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.detail__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--zd-header-height);
+  padding: 0 12px;
+  background-color: var(--zd-surface);
+  border-bottom: 1px solid var(--zd-border);
+}
+
+.detail__title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.detail__number {
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}
+
+.detail__subject {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.detail__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  border-radius: var(--zd-radius-sm);
+  color: var(--zd-text-secondary);
+}
+
+.detail__toggle:hover {
+  background-color: var(--zd-surface-sunken);
+  color: var(--zd-text-main);
+}
+
+.detail__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 16px;
+}
+
+.detail__composer {
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--zd-border);
+  background-color: var(--zd-surface);
+}
+
+.detail__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  padding: 32px 16px;
+  color: var(--zd-text-secondary);
+  text-align: center;
+}
+
+.detail__empty--error {
+  color: var(--zd-danger);
+}
+
+.detail__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: var(--zd-z-overlay);
+  background: rgba(47, 57, 65, 0.35);
+}
+
+/* Tablet: properties slide in from the left, context is an overlay. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .detail__properties--open {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--zd-z-overlay);
+    width: 320px;
+    box-shadow: var(--zd-shadow-md);
+  }
+
+  .detail__context--open {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--zd-z-overlay);
+    width: 320px;
+    box-shadow: var(--zd-shadow-md);
+  }
+}
+
+/* Compact desktop: properties docked, context becomes an overlay. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .detail__properties {
+    display: block;
+    width: var(--zd-properties-width-compact);
+  }
+
+  .detail__context--open {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--zd-z-overlay);
+    width: 300px;
+    box-shadow: var(--zd-shadow-md);
+  }
+}
+
+/* Wide desktop: all three panes docked. */
+@media (min-width: 1280px) {
+  .detail__properties {
+    display: block;
+    width: var(--zd-properties-width);
+  }
+
+  .detail__context {
+    display: block;
+    width: var(--zd-requester-width);
+  }
+
+  .detail__scrim {
+    display: none;
+  }
+}
+
+/* Phones: properties become a bottom sheet, context a full screen sheet. */
+@media (max-width: 767px) {
+  .detail__properties--open {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--zd-z-modal);
+    max-height: 78dvh;
+    border-top-left-radius: var(--zd-radius-lg);
+    border-top-right-radius: var(--zd-radius-lg);
+    box-shadow: var(--zd-shadow-lg);
+  }
+
+  .detail__context--open {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--zd-z-modal);
+  }
+
+  .detail__thread {
+    padding: 12px;
+  }
+
+  .detail__composer {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+}

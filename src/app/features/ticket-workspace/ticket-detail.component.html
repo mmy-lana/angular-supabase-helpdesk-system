@@ -1,0 +1,73 @@
+<div class="detail">
+  @if (propertiesOpen()) {
+    <div class="detail__scrim" (click)="propertiesToggled.emit()"></div>
+  }
+
+  <aside class="detail__properties" [class.detail__properties--open]="propertiesOpen()">
+    <app-ticket-left-sidebar
+      [ticket]="ticket()"
+      [dismissible]="true"
+      (closed)="propertiesToggled.emit()" />
+  </aside>
+
+  <section class="detail__conversation">
+    @if (ticket(); as current) {
+      <header class="detail__header">
+        <button
+          type="button"
+          class="detail__toggle zd-hide-on-wide-desktop"
+          aria-label="Ticket properties"
+          [attr.aria-expanded]="propertiesOpen()"
+          (click)="propertiesToggled.emit()">
+          <app-icon name="settings" [size]="18" />
+        </button>
+
+        <div class="detail__title">
+          <p class="detail__number">#{{ current.ticketNumber }}</p>
+          <h1 class="detail__subject zd-truncate">{{ current.subject }}</h1>
+        </div>
+
+        <app-badge class="zd-hide-on-mobile" kind="status" [value]="current.status" />
+        <app-badge class="zd-hide-on-mobile" kind="priority" [value]="current.priority" />
+
+        <button
+          type="button"
+          class="detail__toggle"
+          aria-label="Requester details"
+          [attr.aria-expanded]="contextOpen()"
+          (click)="contextToggled.emit()">
+          <app-icon name="customers" [size]="18" />
+        </button>
+      </header>
+
+      <div class="detail__thread zd-scroll">
+        @for (comment of comments(); track comment.id) {
+          <app-comment-item [comment]="comment" [ownMessage]="comment.authorId === currentUserId()?.id" />
+        } @empty {
+          <p class="detail__empty">No messages on this ticket yet.</p>
+        }
+      </div>
+
+      <footer class="detail__composer">
+        <app-ticket-comment-box [ticket]="current" [draftKey]="draftKey()" />
+      </footer>
+    } @else if (detail().state === 'loading') {
+      <p class="detail__empty">Loading ticket…</p>
+    } @else if (detail().state === 'error') {
+      <div class="detail__empty detail__empty--error">
+        <p>{{ detail().error }}</p>
+        <app-button variant="secondary" label="Try again" icon="check" (pressed)="tickets.reloadTicket()" />
+      </div>
+    } @else {
+      <p class="detail__empty">Select a ticket to read the conversation.</p>
+    }
+  </section>
+
+  <aside class="detail__context" [class.detail__context--open]="contextOpen()">
+    <app-ticket-customer-pane [ticket]="ticket()" (ticketRequested)="ticketRequested.emit($event)" />
+  </aside>
+
+  @if (contextOpen()) {
+    <div class="detail__scrim detail__scrim--context" (click)="contextToggled.emit()"></div>
+  }
+</div>
