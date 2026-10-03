@@ -32,3 +32,6 @@ coverage/
 repomix-output.xml
 # pnpm
 .pnpm-store/
+
+# Verification output
+artifacts/
