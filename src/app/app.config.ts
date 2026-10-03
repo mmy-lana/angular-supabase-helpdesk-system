@@ -8,6 +8,8 @@ import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from 
 import { appRoutes } from './app.routes';
 import { AuthStateService } from './core/services/auth-state.service';
 import { DataRepository } from './core/services/data-repository.interface';
+import { MockDataRepository } from './core/services/mock-data.repository';
+import { ResilientDataRepository } from './core/services/resilient-data.repository';
 import { SupabaseDataRepository } from './core/services/supabase-data.repository';
 
 /**
@@ -26,9 +28,13 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
     ),
+    // Both backends are registered so the proxy can move between them at run
+    // time: whichever is reachable answers, and neither is constructed twice.
+    SupabaseDataRepository,
+    MockDataRepository,
     {
       provide: DataRepository,
-      useClass: SupabaseDataRepository
+      useClass: ResilientDataRepository
     },
     // Restores a stored session before the first route resolves, so a reload on a
     // deep link does not bounce through the login screen.

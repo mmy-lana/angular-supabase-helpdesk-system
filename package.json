@@ -8,6 +8,10 @@
     "start": "ng serve",
     "start:dev": "ng serve --configuration development",
     "start:demo": "ng serve --configuration demo",
+    "start:docker": "supabase start && ng serve --configuration development",
+    "docker:start": "supabase start",
+    "docker:stop": "supabase stop",
+    "docker:reset": "supabase db reset",
     "build": "ng build",
     "build:demo": "ng build --configuration demo",
     "build:dev": "ng build --configuration development",
@@ -37,6 +41,7 @@
     "@angular/compiler-cli": "latest",
     "jsdom": "latest",
     "playwright": "^1.63.0",
+    "supabase": "^2.119.0",
     "typescript": ">=6.0 <6.1",
     "vite": "latest",
     "vitest": "latest"

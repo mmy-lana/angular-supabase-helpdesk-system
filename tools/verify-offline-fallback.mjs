@@ -98,6 +98,39 @@ if (consoleErrors.length > 0) {
   console.log(consoleErrors.slice(0, 5).map((entry) => `       ${entry}`).join('\n'));
 }
 
+// The workspace has to be usable, not merely reachable: the list, the
+// conversation and a reply all have to work against the offline backend.
+const rows = page.locator('.table__row, .cards__item');
+await rows.first().waitFor({ state: 'visible', timeout: 20000 });
+check((await rows.count()) > 0, 'the workspace lists tickets from the offline backend');
+
+await rows.first().click();
+await page.locator('.detail__subject').waitFor({ state: 'visible', timeout: 20000 });
+await page.locator('app-comment-item').first().waitFor({ state: 'visible', timeout: 20000 });
+check(true, 'the conversation opens offline');
+
+const body = 'Recorded while the container was stopped.';
+await page.locator('.composer__input').fill(body);
+await page.locator('app-button', { hasText: 'Send reply' }).first().click();
+await page
+  .locator('app-comment-item')
+  .filter({ hasText: body })
+  .first()
+  .waitFor({ state: 'visible', timeout: 20000 });
+check(true, 'a reply is accepted offline');
+
+// The symptom being fixed: a red banner, or an error toast, on a workspace that
+// is merely offline.
+const errorToasts = await page.locator('.toast--error').count();
+check(errorToasts === 0, `no error toast is shown (${errorToasts} found)`);
+
+const alertText = await page.locator('[role="alert"]').allTextContents();
+const banners = alertText.filter((text) => /network|failed to|unreachable|offline/i.test(text));
+check(banners.length === 0, `no network banner is shown (${banners.join(' | ')})`);
+
+const websocketAttempts = consoleErrors.filter((entry) => /websocket|54321/i.test(entry));
+check(websocketAttempts.length === 0, `no websocket retries are attempted (${websocketAttempts.length})`);
+
 await page.screenshot({ path: join(SHOTS, 'offline-fallback.png') });
 await context.close();
 await browser.close();

@@ -100,27 +100,47 @@ BEGIN
     RAISE NOTICE 'ok   a customer reply reopens a solved ticket';
 
     ---------------------------------------------------------------------
-    -- A comment bumps updated_at without consuming a version.
-    ---------------------------------------------------------------------
+    -- A comment moves the ticket without consuming a version.
+    --
+    -- The version check is the meaningful one. The timestamp cannot be asserted
+    -- here: `now()` is the transaction timestamp, so it does not advance inside
+    -- this file and the touch is legitimately a no-op until a later transaction
+    -- writes. The trigger's existence and the version it leaves behind are what
+    -- this check verifies; the moving timestamp is covered end to end by
+    -- tools/verify-live-backend.mjs, where each request is its own transaction.
     DECLARE
         v_version INT;
-        v_updated TIMESTAMPTZ;
+        v_touch_trigger BOOLEAN;
     BEGIN
-        SELECT version, updated_at INTO v_version, v_updated FROM public.tickets WHERE id = v_customer_ticket;
-        PERFORM pg_sleep(0.01);
+        SELECT version INTO v_version FROM public.tickets WHERE id = v_customer_ticket;
+
+        SELECT EXISTS (
+            SELECT 1 FROM pg_trigger
+            WHERE tgrelid = 'public.ticket_comments'::regclass
+              AND tgname = 'trg_comment_touch_ticket'
+              AND NOT tgisinternal
+        ) INTO v_touch_trigger;
+
+        IF NOT v_touch_trigger THEN
+            RAISE EXCEPTION 'the comment touch trigger is missing';
+        END IF;
+
         INSERT INTO public.ticket_comments (ticket_id, author_id, body)
         VALUES (v_customer_ticket, v_agent, 'Acknowledged.');
 
         IF (SELECT version FROM public.tickets WHERE id = v_customer_ticket) <> v_version THEN
             RAISE EXCEPTION 'a comment must not increment the ticket version';
         END IF;
-        IF (SELECT updated_at FROM public.tickets WHERE id = v_customer_ticket) <= v_updated THEN
-            RAISE EXCEPTION 'a comment must move updated_at forward';
-        END IF;
-        RAISE NOTICE 'ok   a comment moves updated_at without consuming a version';
+        RAISE NOTICE 'ok   a comment touches the ticket without consuming a version';
     END;
 
+    -- solved_at is cleared when a solved ticket reopens.
     ---------------------------------------------------------------------
+    IF (SELECT solved_at FROM public.tickets WHERE id = v_customer_ticket) IS NOT NULL THEN
+        RAISE EXCEPTION 'reopening a solved ticket must clear solved_at';
+    END IF;
+    RAISE NOTICE 'ok   reopening clears the solved timestamp';
+
     -- Optimistic concurrency: a stale version writes nothing.
     ---------------------------------------------------------------------
     DECLARE
@@ -154,15 +174,25 @@ BEGIN
     RAISE NOTICE 'ok   internal notes are stored and readable by the database';
 
     ---------------------------------------------------------------------
-    -- The audit trail is written by trigger, not by the client.
+    -- The audit trail is written by trigger and cannot be forged by a client.
     ---------------------------------------------------------------------
     IF NOT EXISTS (
         SELECT 1 FROM public.ticket_audit_logs
-        WHERE ticket_id = v_customer_ticket AND action = 'ticket_created'
+        WHERE ticket_id = v_customer_ticket AND action = 'ticket_updated'
     ) THEN
-        RAISE EXCEPTION 'the ticket creation audit entry is missing';
+        RAISE EXCEPTION 'the reopen should have produced a ticket_updated audit entry';
     END IF;
-    RAISE NOTICE 'ok   ticket changes are written to the audit log';
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.role_table_grants
+        WHERE grantee = 'authenticated'
+          AND table_schema = 'public'
+          AND table_name = 'ticket_audit_logs'
+          AND privilege_type IN ('INSERT', 'UPDATE', 'DELETE')
+    ) THEN
+        RAISE EXCEPTION 'a signed in client must not be able to write the audit log';
+    END IF;
+    RAISE NOTICE 'ok   the audit trail is trigger written and not client writable';
 
     -- `v_admin` exists so the fixture block documents who may assign work.
     PERFORM 1 FROM public.profiles WHERE id = v_admin;

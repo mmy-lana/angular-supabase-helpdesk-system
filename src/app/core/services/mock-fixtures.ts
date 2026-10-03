@@ -1,4 +1,5 @@
 import { environment } from '../../../environments/environment';
+import { DemoTicketSeed } from '../../../environments/environment.interface';
 import {
   ProfileRow,
   TicketAuditLogRow,
@@ -36,15 +37,16 @@ function daysAgo(days: number): string {
   return new Date(Date.now() - days * DAY).toISOString();
 }
 
+/**
+ * Identity id for a role, taken from the directory the environment declares.
+ *
+ * A build with no directory (production) falls back to a stable synthetic id, so
+ * the offline backend still constructs and an empty workspace still opens
+ * instead of the module failing at import time.
+ */
 function idForRole(role: ProfileRow['role'], ordinal = 0): string {
   const matches = environment.demoIdentities.filter((identity) => identity.role === role);
-  const identity = matches[ordinal];
-  if (!identity) {
-    throw new Error(
-      `The showcase needs ${ordinal + 1} ${role} identit${ordinal === 0 ? 'y' : 'ies'}; declare them in src/environments/environment.demo.ts.`
-    );
-  }
-  return identity.id;
+  return matches[ordinal]?.id ?? `offline-${role}-${ordinal + 1}`;
 }
 
 /**
@@ -86,246 +88,6 @@ export function assignableMockProfiles(): readonly ProfileRow[] {
   return Object.freeze(MOCK_PROFILES.filter((profile) => profile.role !== 'customer'));
 }
 
-interface CommentSeed {
-  readonly authorId: string;
-  readonly body: string;
-  /** Defaults to the age of the ticket, i.e. the opening message. */
-  readonly hoursAgo?: number;
-  readonly isInternal?: boolean;
-}
-
-interface TicketSeed {
-  readonly requesterId: string;
-  readonly assigneeId: string | null;
-  readonly subject: string;
-  readonly status: TicketStatus;
-  readonly priority: TicketPriority;
-  readonly type: TicketType;
-  readonly tags: readonly string[];
-  readonly createdHoursAgo: number;
-  readonly solvedHoursAgo?: number;
-  readonly comments: readonly CommentSeed[];
-}
-
-const SEEDS: readonly TicketSeed[] = [
-  {
-    requesterId: MOCK_PROFILE_IDS.customer,
-    assigneeId: null,
-    subject: 'March invoice export downloads an empty file',
-    status: 'new',
-    priority: 'high',
-    type: 'incident',
-    tags: ['billing', 'export'],
-    createdHoursAgo: 2,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.customer,
-        body: 'Our finance team runs the invoice export every last working day of the month. Since the February release the download is a 0 byte file, both from the UI and from the scheduled job. Nothing changed on our side.'
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.secondCustomer,
-    assigneeId: MOCK_PROFILE_IDS.agent,
-    subject: 'Cannot add a second billing contact to our workspace',
-    status: 'open',
-    priority: 'normal',
-    type: 'problem',
-    tags: ['accounts', 'contacts'],
-    createdHoursAgo: 7,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.secondCustomer,
-        body: 'The "Add contact" button is greyed out for our second billing contact. We have owner, admin and billing roles assigned already.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Thanks for the screenshots. The workspace is on the legacy contact model, which only allows one billing contact. I am checking with the account team whether we can move you across.'
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.thirdCustomer,
-    assigneeId: null,
-    subject: 'SSO login loop for users with two email addresses',
-    status: 'new',
-    priority: 'urgent',
-    type: 'incident',
-    tags: ['sso', 'login'],
-    createdHoursAgo: 11,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.thirdCustomer,
-        body: 'Around forty users are bounced back to the sign in page after the identity provider. They all have a personal address as a secondary alias.'
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.customer,
-    assigneeId: MOCK_PROFILE_IDS.secondAgent,
-    subject: 'Webhook retries are duplicating order updates',
-    status: 'pending',
-    priority: 'normal',
-    type: 'problem',
-    tags: ['api', 'webhooks'],
-    createdHoursAgo: 26,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.customer,
-        body: 'We receive the same order.updated event two or three times when our endpoint takes longer than two seconds to answer.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.secondAgent,
-        body: 'That matches the retry window we changed last quarter. Could you send a request id from one duplicated delivery so I can look at the attempt log?'
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.secondCustomer,
-    assigneeId: MOCK_PROFILE_IDS.agent,
-    subject: 'How do I move a ticket to a different team?',
-    status: 'solved',
-    priority: 'low',
-    type: 'question',
-    tags: [],
-    createdHoursAgo: 50,
-    solvedHoursAgo: 44,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.secondCustomer,
-        body: 'We want to route billing questions to a different group of agents without reassigning every ticket by hand.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Open the ticket properties and pick a different team in the assignee field. The view on the left filters by team afterwards.',
-        hoursAgo: 46
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.secondCustomer,
-        body: 'That is exactly what we needed. Thank you.',
-        hoursAgo: 44
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.thirdCustomer,
-    assigneeId: MOCK_PROFILE_IDS.agent,
-    subject: 'Attachment upload fails for files larger than 4 MB',
-    status: 'open',
-    priority: 'normal',
-    type: 'incident',
-    tags: ['attachments', 'upload'],
-    createdHoursAgo: 73,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.thirdCustomer,
-        body: 'Screenshots of 4.5 MB fail with "upload failed". Smaller files go through.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Confirmed on our side as well. The storage limit is currently applied lower than the documented 10 MB.',
-        hoursAgo: 60
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Infrastructure ticket raised internally, reference OPS-2291. I will keep this thread updated.',
-        hoursAgo: 58,
-        isInternal: true
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.customer,
-    assigneeId: MOCK_PROFILE_IDS.agent,
-    subject: 'Password reset emails never arrive',
-    status: 'solved',
-    priority: 'urgent',
-    type: 'incident',
-    tags: ['login', 'email'],
-    createdHoursAgo: 96,
-    solvedHoursAgo: 90,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.customer,
-        body: 'Three colleagues asked for a reset link this morning and none of the emails arrived, including the spam folder.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Our mail provider was rate limiting the workspace. The limit is lifted and pending resets go out on the next retry.',
-        hoursAgo: 92
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.customer,
-        body: 'All three people are back in. Thanks for the quick turnaround.',
-        hoursAgo: 90
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.secondCustomer,
-    assigneeId: null,
-    subject: 'Custom fields are missing from the ticket export',
-    status: 'new',
-    priority: 'low',
-    type: 'task',
-    tags: ['export'],
-    createdHoursAgo: 120,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.secondCustomer,
-        body: 'We added a "Region" field last month. It shows in the UI but not in the CSV we download each Monday.'
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.thirdCustomer,
-    assigneeId: MOCK_PROFILE_IDS.secondAgent,
-    subject: 'Audit log retention: can we extend beyond 90 days?',
-    status: 'closed',
-    priority: 'normal',
-    type: 'question',
-    tags: ['compliance', 'audit'],
-    createdHoursAgo: 240,
-    solvedHoursAgo: 200,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.thirdCustomer,
-        body: 'Our auditors ask for a year of change history. The workspace only keeps 90 days.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.secondAgent,
-        body: 'Retention can be raised to 400 days on your plan. I have sent the self service form.',
-        hoursAgo: 230
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.thirdCustomer,
-        body: 'Form submitted, thank you for confirming the limit.',
-        hoursAgo: 225
-      }
-    ]
-  },
-  {
-    requesterId: MOCK_PROFILE_IDS.customer,
-    assigneeId: MOCK_PROFILE_IDS.agent,
-    subject: 'Ticket numbers restarted after the workspace merge',
-    status: 'pending',
-    priority: 'normal',
-    type: 'question',
-    tags: ['accounts'],
-    createdHoursAgo: 300,
-    comments: [
-      {
-        authorId: MOCK_PROFILE_IDS.customer,
-        body: 'After we merged the two workspaces our ticket numbers started again at 1, which breaks the reference in our audit documents.'
-      },
-      {
-        authorId: MOCK_PROFILE_IDS.agent,
-        body: 'Numbering is continuous per workspace in the current release. I am checking whether the merged workspace can keep its original range.',
-        hoursAgo: 280
-      }
-    ]
-  }
-];
 
 /** Builds a stable RFC 4122 shaped id from an 8 character prefix and a sequence number. */
 function seededUuid(prefix: string, sequence: number): string {
@@ -343,11 +105,12 @@ export interface MockDataset {
  * `SEEDS`, so the same ticket keeps the same identity across reloads.
  */
 export function buildMockDataset(): MockDataset {
+  const seeds: readonly DemoTicketSeed[] = environment.demoTicketSeeds;
   const tickets: TicketRow[] = [];
   const comments: TicketCommentRow[] = [];
   const auditLogs: TicketAuditLogRow[] = [];
 
-  SEEDS.forEach((seed, index) => {
+  seeds.forEach((seed, index) => {
     const ticketId = seededUuid('7c1d4e20', index + 1);
     const createdAt = hoursAgo(seed.createdHoursAgo);
     const lastActivity = seed.comments.reduce(

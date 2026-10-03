@@ -35,3 +35,7 @@ repomix-output.xml
 
 # Verification output
 artifacts/
+
+# Supabase CLI
+supabase/.branches/
+supabase/.temp/

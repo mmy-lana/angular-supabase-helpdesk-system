@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  afterNextRender,
   computed,
   effect,
   inject,
@@ -343,7 +342,7 @@ export class DropdownComponent {
     this.open.set(false);
     this.activeIndex.set(-1);
     this.openedChange.emit(false);
-    afterNextRender(() => this.triggerRef().nativeElement.focus());
+    this.restoreFocus();
   }
 
   protected select(option: DropdownOption): void {
@@ -354,7 +353,7 @@ export class DropdownComponent {
     this.open.set(false);
     this.activeIndex.set(-1);
     this.openedChange.emit(false);
-    afterNextRender(() => this.triggerRef().nativeElement.focus());
+    this.restoreFocus();
   }
 
   protected activate(index: number): void {
@@ -441,6 +440,14 @@ export class DropdownComponent {
       }
     }
     return -1;
+  }
+
+  /**
+   * Returns focus to the trigger after the panel closes, so keyboard users are
+   * not dropped back on the document body.
+   */
+  private restoreFocus(): void {
+    this.triggerRef().nativeElement.focus();
   }
 
   private scrollActiveIntoView(index: number): void {

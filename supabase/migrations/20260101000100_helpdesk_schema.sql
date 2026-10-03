@@ -101,10 +101,13 @@ ALTER TABLE public.ticket_comments REPLICA IDENTITY FULL;
 
 -- Functions ------------------------------------------------------------------
 -- Every function pins `search_path = ''` and qualifies names, so a caller cannot
--- shadow `auth.uid()` or the table references through a temporary object.
+-- shadow `auth.uid()` or the table references through a temporary object. That
+-- empty path is also in force while PostgreSQL validates a function body, so
+-- custom enum types have to be written as `public.ticket_status` rather than
+-- `ticket_status` even though both name the same type.
 
 CREATE OR REPLACE FUNCTION public.current_user_role()
-RETURNS user_role AS $$
+RETURNS public.user_role AS $$
     SELECT role FROM public.profiles WHERE id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '';
 
@@ -223,7 +226,7 @@ CREATE TRIGGER trg_audit_ticket_changes
 CREATE OR REPLACE FUNCTION public.handle_comment_before_insert()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_ticket_status ticket_status;
+    v_ticket_status public.ticket_status;
     v_att JSONB;
 BEGIN
     SELECT status INTO v_ticket_status FROM public.tickets WHERE id = NEW.ticket_id;
@@ -264,8 +267,8 @@ CREATE TRIGGER trg_comment_touch_ticket
 CREATE OR REPLACE FUNCTION public.handle_customer_reply_reopen()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_author_role user_role;
-    v_ticket_status ticket_status;
+    v_author_role public.user_role;
+    v_ticket_status public.ticket_status;
 BEGIN
     SELECT role INTO v_author_role FROM public.profiles WHERE id = NEW.author_id;
     SELECT status INTO v_ticket_status FROM public.tickets WHERE id = NEW.ticket_id;
@@ -289,8 +292,8 @@ CREATE TRIGGER trg_customer_reply_reopen
 CREATE OR REPLACE FUNCTION public.create_ticket_atomic(
     p_subject TEXT,
     p_body TEXT,
-    p_priority ticket_priority DEFAULT 'normal',
-    p_type ticket_type DEFAULT 'question',
+    p_priority public.ticket_priority DEFAULT 'normal',
+    p_type public.ticket_type DEFAULT 'question',
     p_tags TEXT[] DEFAULT '{}'::TEXT[],
     p_assignee_id UUID DEFAULT NULL,
     p_attachments JSONB DEFAULT '[]'::jsonb
@@ -298,7 +301,7 @@ CREATE OR REPLACE FUNCTION public.create_ticket_atomic(
 RETURNS public.tickets AS $$
 DECLARE
     v_user_id UUID;
-    v_user_role user_role;
+    v_user_role public.user_role;
     v_ticket public.tickets;
     v_att JSONB;
 BEGIN
@@ -378,8 +381,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
-REVOKE EXECUTE ON FUNCTION public.create_ticket_atomic(TEXT, TEXT, ticket_priority, ticket_type, TEXT[], UUID, JSONB) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.create_ticket_atomic(TEXT, TEXT, ticket_priority, ticket_type, TEXT[], UUID, JSONB) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.create_ticket_atomic(TEXT, TEXT, public.ticket_priority, public.ticket_type, TEXT[], UUID, JSONB) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.create_ticket_atomic(TEXT, TEXT, public.ticket_priority, public.ticket_type, TEXT[], UUID, JSONB) TO authenticated;
 
 -- Row level security ---------------------------------------------------------
 

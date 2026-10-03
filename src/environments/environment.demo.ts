@@ -1,3 +1,4 @@
+import { DEMO_PROFILE_IDS, DEMO_TICKET_SEEDS } from './demo-ticket-seeds';
 import { EnvironmentConfig } from './environment.interface';
 
 /**
@@ -29,39 +30,40 @@ export const environment: EnvironmentConfig = {
       password: 'DemoPassword123!'
     }
   ],
+  demoTicketSeeds: DEMO_TICKET_SEEDS,
   demoIdentities: [
     {
-      id: '5f2b9c10-0001-4c7a-9a11-000000000001',
+      id: DEMO_PROFILE_IDS.admin,
       email: 'admin@example.org',
       fullName: 'Priya Raman',
       role: 'admin'
     },
     {
-      id: '5f2b9c10-0002-4c7a-9a11-000000000002',
+      id: DEMO_PROFILE_IDS.agent,
       email: 'agent@example.com',
       fullName: 'Nina Okafor',
       role: 'agent'
     },
     {
-      id: '5f2b9c10-0003-4c7a-9a11-000000000003',
+      id: DEMO_PROFILE_IDS.secondAgent,
       email: 'marcus.feld@example.org',
       fullName: 'Marcus Feld',
       role: 'agent'
     },
     {
-      id: '5f2b9c10-0004-4c7a-9a11-000000000004',
+      id: DEMO_PROFILE_IDS.customer,
       email: 'customer@example.com',
       fullName: 'Tomas Eriksen',
       role: 'customer'
     },
     {
-      id: '5f2b9c10-0005-4c7a-9a11-000000000005',
+      id: DEMO_PROFILE_IDS.secondCustomer,
       email: 'aiko.tanaka@example.org',
       fullName: 'Aiko Tanaka',
       role: 'customer'
     },
     {
-      id: '5f2b9c10-0006-4c7a-9a11-000000000006',
+      id: DEMO_PROFILE_IDS.thirdCustomer,
       email: 'samuel.ortiz@example.org',
       fullName: 'Samuel Ortiz',
       role: 'customer'

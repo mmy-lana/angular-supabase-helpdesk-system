@@ -7,6 +7,7 @@ import { HelpdeskMapper } from '../mappers/helpdesk.mapper';
 import { Profile } from '../models/helpdesk.models';
 import { clearStored, readStoredJson, writeStoredJson } from '../../shared/utils/browser-storage';
 import { SupabaseService } from './supabase.service';
+import { isTransportFailure } from './transport-failure';
 
 /** Local storage key holding the showcase session address. */
 const MOCK_SESSION_KEY = 'MOCK_SESSION_V1';
@@ -53,6 +54,16 @@ export class AuthStateService {
   readonly demoSwitchingEnabled = !environment.production && environment.demoAccounts.length > 0;
   readonly usesMockData = environment.useMockData;
 
+  /**
+   * True once this browser has concluded that Supabase cannot be reached.
+   *
+   * The flag starts true for a build configured on mock data and flips the first
+   * time a request fails at the transport layer. `ResilientDataRepository` reads
+   * it to choose its backend, and `TicketRealtimeService` reads it to stay off
+   * the websocket, so neither has to rediscover the outage on its own.
+   */
+  readonly isOperatingOffline = signal<boolean>(environment.useMockData);
+
   /** Idempotent: the first caller starts session restoration, later callers await it. */
   ensureInitialized(): Promise<void> {
     this.initialization ??= this.initialize();
@@ -94,7 +105,7 @@ export class AuthStateService {
         }
         throw failure;
       }
-      await this.loadAuthenticatedProfile(this.supabase.client.auth.getUser);
+      await this.loadAuthenticatedProfile(() => this.supabase.client.auth.getUser());
     } catch (failure) {
       this.errorSignal.set(this.describeAuthError(failure instanceof Error ? failure.message : String(failure)));
       throw failure;
@@ -174,7 +185,7 @@ export class AuthStateService {
     if (environment.useMockData) {
       return;
     }
-    await this.loadAuthenticatedProfile(this.supabase.client.auth.getUser);
+    await this.loadAuthenticatedProfile(() => this.supabase.client.auth.getUser());
   }
 
   clearError(): void {
@@ -201,7 +212,7 @@ export class AuthStateService {
     try {
       const { data } = await this.supabase.client.auth.getSession();
       if (data.session?.user) {
-        await this.loadAuthenticatedProfile(this.supabase.client.auth.getUser);
+        await this.loadAuthenticatedProfile(() => this.supabase.client.auth.getUser());
       } else {
         this.profileSignal.set(null);
         this.statusSignal.set('anonymous');
@@ -209,12 +220,15 @@ export class AuthStateService {
       this.listenForAuthChanges();
     } catch (failure) {
       this.profileSignal.set(null);
-      // Without a container there is nothing to restore. Reporting "anonymous"
-      // lets the login screen offer the demo identities instead of dead-ending
-      // on a misconfigured build the developer cannot fix from the browser.
-      this.statusSignal.set(
-        !environment.production && this.isOfflineFailure(failure) ? 'anonymous' : this.statusSignal() ?? 'anonymous'
-      );
+      if (!environment.production && isTransportFailure(failure)) {
+        // Nothing to restore and nowhere to restore it from. Recording the
+        // outage switches the data layer to mock repositories as well, so the
+        // whole workspace degrades instead of just the login screen.
+        this.isOperatingOffline.set(true);
+        this.statusSignal.set('anonymous');
+        return;
+      }
+      this.statusSignal.set('anonymous');
       this.errorSignal.set(this.describeAuthError(failure instanceof Error ? failure.message : String(failure)));
     }
   }
@@ -228,29 +242,18 @@ export class AuthStateService {
    * account being used is one this build declares itself.
    */
   private fallBackToDemoIdentityIfOffline(email: string, password: string, cause: unknown): boolean {
-    if (environment.production || !this.isOfflineFailure(cause) || !this.isDemoAccount(email)) {
+    if (environment.production || !isTransportFailure(cause) || !this.isDemoAccount(email)) {
       return false;
     }
     console.warn(
       'Supabase container unreachable on port 54321. Seamlessly falling back to local demo mock identity.'
     );
+    this.isOperatingOffline.set(true);
     this.signInToMockAccount(email, password);
     return true;
   }
 
-  /** True when the failure was the server being unreachable rather than a rejection. */
-  private isOfflineFailure(failure: unknown): boolean {
-    const message = (failure instanceof Error ? failure.message : String(failure)).toLowerCase();
-    return (
-      message.includes('failed to fetch') ||
-      message.includes('network') ||
-      message.includes('connection refused') ||
-      message.includes('err_connection_refused') ||
-      message.includes('load failed')
-    );
-  }
-
-  private isDemoAccount(email: string): boolean {
+    private isDemoAccount(email: string): boolean {
     return environment.demoAccounts.some((account) => account.email.toLowerCase() === email);
   }
 
@@ -265,7 +268,7 @@ export class AuthStateService {
         return;
       }
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
-        void this.loadAuthenticatedProfile(this.supabase.client.auth.getUser);
+        void this.loadAuthenticatedProfile(() => this.supabase.client.auth.getUser());
       }
     });
     this.authSubscription = data.subscription;

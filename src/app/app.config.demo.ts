@@ -9,14 +9,17 @@ import { appRoutes } from './app.routes';
 import { AuthStateService } from './core/services/auth-state.service';
 import { DataRepository } from './core/services/data-repository.interface';
 import { MockDataRepository } from './core/services/mock-data.repository';
+import { ResilientDataRepository } from './core/services/resilient-data.repository';
+import { SupabaseDataRepository } from './core/services/supabase-data.repository';
 
 /**
  * Bootstrap configuration for the offline showcase.
  *
  * `ng build --configuration demo` replaces `app.config.ts` with this file (see
- * the `fileReplacements` entry in angular.json). Keeping the showcase wiring in
- * its own module is what lets a production build leave the entire mock backend,
- * its fixtures and its sample tickets out of the bundle.
+ * the `fileReplacements` entry in angular.json). The showcase sample data itself
+ * lives in `environment.demo.ts`, which is what keeps a production build free of
+ * fabricated ticket content; the mock backend is registered here because the
+ * resilient proxy needs both backends whichever configuration is running.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,9 +29,11 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
     ),
+    SupabaseDataRepository,
+    MockDataRepository,
     {
       provide: DataRepository,
-      useClass: MockDataRepository
+      useClass: ResilientDataRepository
     },
     provideAppInitializer(() => inject(AuthStateService).ensureInitialized())
   ]

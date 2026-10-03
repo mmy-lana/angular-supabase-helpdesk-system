@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { TicketCommentRow, TicketRow } from '../models/database.types';
 import { Ticket, TicketComment } from '../models/helpdesk.models';
 import { HelpdeskMapper } from '../mappers/helpdesk.mapper';
+import { AuthStateService } from './auth-state.service';
 import { SupabaseService } from './supabase.service';
 
 export const GLOBAL_TICKETS_CHANNEL = 'tickets-global-feed';
@@ -44,6 +45,7 @@ export interface CommentChangeEvent {
 @Injectable({ providedIn: 'root' })
 export class TicketRealtimeService {
   private readonly supabase = inject(SupabaseService);
+  private readonly authState = inject(AuthStateService);
 
   private readonly ticketEventsSignal = signal<readonly TicketChangeEvent[]>([]);
   private readonly commentEventsSignal = signal<readonly CommentChangeEvent[]>([]);
@@ -54,7 +56,9 @@ export class TicketRealtimeService {
 
   readonly ticketEvents = this.ticketEventsSignal.asReadonly();
   readonly commentEvents = this.commentEventsSignal.asReadonly();
-  readonly isLive = computed(() => environment.useMockData || this.supabase.isConfigured);
+  readonly isLive = computed(
+    () => environment.useMockData || (!this.authState.isOperatingOffline() && this.supabase.isConfigured)
+  );
   readonly watchedTickets = this.watchedTicketIds.asReadonly();
 
   constructor() {
@@ -68,7 +72,10 @@ export class TicketRealtimeService {
 
   /** Opens the global feed. Safe to call repeatedly; only the first call subscribes. */
   startGlobalFeed(): void {
-    if (this.globalChannel || environment.useMockData) {
+    // Opening a channel against a dead host produces a websocket retry loop in
+    // the console for as long as the tab is open. While the backend is known to
+    // be unreachable the feed is served from the offline repository instead.
+    if (this.globalChannel || environment.useMockData || this.authState.isOperatingOffline()) {
       return;
     }
 
@@ -129,7 +136,7 @@ export class TicketRealtimeService {
   }
 
   private openTicketChannel(ticketId: string): void {
-    if (this.ticketChannels.has(ticketId) || environment.useMockData) {
+    if (this.ticketChannels.has(ticketId) || environment.useMockData || this.authState.isOperatingOffline()) {
       return;
     }
 

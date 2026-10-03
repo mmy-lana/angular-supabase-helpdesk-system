@@ -18,5 +18,8 @@ export const environment: EnvironmentConfig = {
   supabaseUrl: '',
   supabaseAnonKey: '',
   demoAccounts: [],
-  demoIdentities: []
+  // No sample content and no demo accounts in a production build: the offline
+  // backend is present for resilience but starts empty and cannot be signed into.
+  demoIdentities: [],
+  demoTicketSeeds: []
 };
