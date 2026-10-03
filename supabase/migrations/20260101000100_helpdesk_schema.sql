@@ -319,7 +319,12 @@ BEGIN
         IF p_assignee_id IS NOT NULL THEN
             RAISE EXCEPTION 'Customers cannot assign tickets.' USING ERRCODE = 'HD004';
         END IF;
+        -- Priority and type drive the queue an agent works through. Letting a
+        -- customer pick them at creation time is an escalation path, so both are
+        -- pinned to the least urgent reading and left to the agents to raise.
         p_tags := '{}'::TEXT[];
+        p_priority := 'normal';
+        p_type := 'question';
     END IF;
 
     FOR v_att IN SELECT * FROM jsonb_array_elements(COALESCE(p_attachments, '[]'::jsonb))

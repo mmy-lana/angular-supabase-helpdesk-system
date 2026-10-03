@@ -27,7 +27,21 @@ export const environment: EnvironmentConfig = {
       password: 'DevPassword123!'
     }
   ],
-  // The local instance is seeded by supabase/seed.sql, so no fixture profiles
-  // are needed here and none are shipped in this bundle.
-  demoIdentities: []
+  // The seeded instance owns the profiles, but these two identities are declared
+  // here as well: when the local container is not running, `AuthStateService`
+  // falls back to them so `ng serve` stays usable without Docker.
+  demoIdentities: [
+    {
+      id: '5f2b9c10-0002-4c7a-9a11-000000000002',
+      email: 'agent@example.com',
+      fullName: 'Nina Okafor',
+      role: 'agent'
+    },
+    {
+      id: '5f2b9c10-0004-4c7a-9a11-000000000004',
+      email: 'customer@example.com',
+      fullName: 'Tomas Eriksen',
+      role: 'customer'
+    }
+  ]
 };

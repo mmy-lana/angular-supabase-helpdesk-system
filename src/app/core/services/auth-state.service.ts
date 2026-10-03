@@ -73,12 +73,26 @@ export class AuthStateService {
         return;
       }
 
-      const { error } = await this.supabase.client.auth.signInWithPassword({
-        email: trimmedEmail,
-        password
-      });
-      if (error) {
-        throw new Error(this.describeAuthError(error.message));
+      try {
+        const { error } = await this.supabase.client.auth.signInWithPassword({
+          email: trimmedEmail,
+          password
+        });
+        if (error) {
+          if (this.fallBackToDemoIdentityIfOffline(trimmedEmail, password, error.message)) {
+            return;
+          }
+          throw new Error(this.describeAuthError(error.message));
+        }
+      } catch (failure) {
+        // A local container that is not running must not lock a developer out of
+        // their own workspace. The raw message is inspected before it is
+        // rewritten, because the friendly wording hides whether it was a
+        // rejection or a transport failure.
+        if (this.fallBackToDemoIdentityIfOffline(trimmedEmail, password, failure)) {
+          return;
+        }
+        throw failure;
       }
       await this.loadAuthenticatedProfile(this.supabase.client.auth.getUser);
     } catch (failure) {
@@ -195,9 +209,49 @@ export class AuthStateService {
       this.listenForAuthChanges();
     } catch (failure) {
       this.profileSignal.set(null);
-      this.statusSignal.set('anonymous');
+      // Without a container there is nothing to restore. Reporting "anonymous"
+      // lets the login screen offer the demo identities instead of dead-ending
+      // on a misconfigured build the developer cannot fix from the browser.
+      this.statusSignal.set(
+        !environment.production && this.isOfflineFailure(failure) ? 'anonymous' : this.statusSignal() ?? 'anonymous'
+      );
       this.errorSignal.set(this.describeAuthError(failure instanceof Error ? failure.message : String(failure)));
     }
+  }
+
+  /**
+   * Signs a bundled demo identity in when Supabase cannot be reached.
+   *
+   * Only a transport failure qualifies, and only outside a production build: a
+   * wrong password or an unknown account must still be reported. The throw in
+   * `signIn` is deliberately never reached on the fallback path, because the
+   * account being used is one this build declares itself.
+   */
+  private fallBackToDemoIdentityIfOffline(email: string, password: string, cause: unknown): boolean {
+    if (environment.production || !this.isOfflineFailure(cause) || !this.isDemoAccount(email)) {
+      return false;
+    }
+    console.warn(
+      'Supabase container unreachable on port 54321. Seamlessly falling back to local demo mock identity.'
+    );
+    this.signInToMockAccount(email, password);
+    return true;
+  }
+
+  /** True when the failure was the server being unreachable rather than a rejection. */
+  private isOfflineFailure(failure: unknown): boolean {
+    const message = (failure instanceof Error ? failure.message : String(failure)).toLowerCase();
+    return (
+      message.includes('failed to fetch') ||
+      message.includes('network') ||
+      message.includes('connection refused') ||
+      message.includes('err_connection_refused') ||
+      message.includes('load failed')
+    );
+  }
+
+  private isDemoAccount(email: string): boolean {
+    return environment.demoAccounts.some((account) => account.email.toLowerCase() === email);
   }
 
   private listenForAuthChanges(): void {

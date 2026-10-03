@@ -6,11 +6,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:dev": "ng serve --configuration development",
+    "start:demo": "ng serve --configuration demo",
     "build": "ng build",
     "build:demo": "ng build --configuration demo",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "vitest run",
     "verify:viewports": "node tools/verify-viewports.mjs",
+    "verify:offline": "node tools/verify-offline-fallback.mjs",
     "serve:dist": "node tools/serve-dist.mjs"
   },
   "dependencies": {

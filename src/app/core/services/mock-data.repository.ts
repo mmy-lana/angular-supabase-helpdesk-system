@@ -460,13 +460,34 @@ export class MockDataRepository implements DataRepository {
   }
 
   private decorate(rows: readonly TicketRow[]): readonly Ticket[] {
-    return rows.map((row) =>
-      HelpdeskMapper.toTicket(
+    return rows.map((row) => {
+      // A requester missing from the directory is usually the person using the
+      // app right now, because a development target only lists two identities.
+      // Falling back to the signed in profile keeps the row attributed instead of
+      // rendering as "Unknown requester".
+      const requester = this.profile(row.requester_id) ?? this.currentUserAsProfile(row.requester_id);
+      return HelpdeskMapper.toTicket(
         row,
-        this.profile(row.requester_id),
+        requester,
         row.assignee_id ? (this.profile(row.assignee_id) ?? null) : null
-      )
-    );
+      );
+    });
+  }
+
+  private currentUserAsProfile(id: string): ProfileRow | undefined {
+    const current = this.authState.currentUser();
+    if (!current || current.id !== id) {
+      return undefined;
+    }
+    return {
+      id: current.id,
+      email: current.email,
+      full_name: current.fullName,
+      avatar_url: current.avatarUrl,
+      role: current.role,
+      created_at: current.createdAt,
+      updated_at: current.updatedAt
+    };
   }
 
   private profile(id: string): ProfileRow | undefined {

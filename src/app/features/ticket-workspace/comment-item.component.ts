@@ -56,7 +56,7 @@ export class CommentItemComponent {
   protected openAttachment(filePath: string): void {
     void this.tickets.attachmentUrl(filePath).then((url) => {
       if (url) {
-        window.open(url, '_blank', 'noopener');
+        window.open(url, '_blank', 'noopener,noreferrer');
       }
     });
   }

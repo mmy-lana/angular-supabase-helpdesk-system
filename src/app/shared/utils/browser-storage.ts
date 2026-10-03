@@ -1,13 +1,21 @@
 const PREFIX = 'HELPDESK';
 
 /**
- * Local storage access that never throws: private browsing modes and hardened
- * browser profiles can make `localStorage` unavailable, and a help desk must
- * still render (without remembering anything) in that case.
+ * Session storage access that never throws.
+ *
+ * `sessionStorage` rather than `localStorage` on purpose: what lands here is the
+ * signed in identity and, on the showcase, the whole mock dataset, including
+ * ticket text and addresses. Keeping it in the session means closing the tab
+ * purges it instead of leaving it on disk for the next person to open the
+ * browser.
+ *
+ * Private browsing modes and hardened browser profiles can make storage
+ * unavailable entirely; a help desk must still render without remembering
+ * anything in that case.
  */
 function storage(): Storage | null {
   try {
-    const candidate = globalThis.localStorage;
+    const candidate = globalThis.sessionStorage;
     if (!candidate) {
       return null;
     }

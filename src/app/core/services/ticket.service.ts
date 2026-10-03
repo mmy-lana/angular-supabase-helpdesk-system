@@ -163,6 +163,15 @@ export class TicketService {
   private readonly handledTicketEvents = new Set<string>();
   private readonly handledCommentEvents = new Set<string>();
 
+  /**
+   * Serialises property writes.
+   *
+   * Two rapid edits both read the same version, and the second one loses the race
+   * as a conflict warning about a change nobody else made. Running writes one at
+   * a time lets each observe the version the previous write produced.
+   */
+  private mutationQueue: Promise<unknown> = Promise.resolve();
+
   readonly viewDefinitions = TICKET_VIEWS;
   readonly activeView = this.activeViewId.asReadonly();
   readonly viewLists = this.views.asReadonly();
@@ -312,6 +321,17 @@ export class TicketService {
    * instead of overwriting somebody else's decision.
    */
   async updateProperty(ticketId: string, patch: TicketPropertyPatch): Promise<boolean> {
+    const queued = this.mutationQueue.then(() => this.executePropertyUpdate(ticketId, patch));
+    // The chain itself must never reject, or one failed write would block every
+    // later one; failures travel through the returned value instead.
+    this.mutationQueue = queued.then(
+      () => undefined,
+      () => undefined
+    );
+    return queued;
+  }
+
+  private async executePropertyUpdate(ticketId: string, patch: TicketPropertyPatch): Promise<boolean> {
     const current = this.records().get(ticketId) ?? this.detail().ticket;
     if (!current || current.id !== ticketId) {
       return false;

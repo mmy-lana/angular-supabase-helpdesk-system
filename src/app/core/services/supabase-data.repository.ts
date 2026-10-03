@@ -103,8 +103,12 @@ export class SupabaseDataRepository implements DataRepository {
 
     if (cursor) {
       // Keyset pagination: strictly older than the last row of the previous page.
+      // The timestamp is percent encoded because PostgREST reads `or()` as a comma
+      // separated filter list: an unencoded value carrying a comma would split one
+      // comparison into two and quietly return the wrong page.
+      const encodedCreatedAt = encodeURIComponent(cursor.createdAt);
       query = query.or(
-        `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`
+        `created_at.lt.${encodedCreatedAt},and(created_at.eq.${encodedCreatedAt},id.lt.${cursor.id})`
       );
     }
 

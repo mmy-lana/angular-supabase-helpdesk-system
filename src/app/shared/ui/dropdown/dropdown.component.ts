@@ -114,7 +114,11 @@ let nextDropdownId = 0;
       z-index: var(--zd-z-overlay);
       top: calc(100% + 4px);
       left: 0;
+      box-sizing: border-box;
       min-width: 100%;
+      /* An option label can be long enough to push the list past the edge of a
+         phone; capping the width keeps the page from scrolling sideways. */
+      max-width: calc(100vw - 32px);
       max-height: 320px;
       padding: 4px;
       overflow-y: auto;

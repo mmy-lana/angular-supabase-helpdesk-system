@@ -29,9 +29,11 @@
 .detail__header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
   min-height: var(--zd-header-height);
   padding: 0 12px;
+  overflow: hidden;
   background-color: var(--zd-surface);
   border-bottom: 1px solid var(--zd-border);
 }
@@ -39,6 +41,7 @@
 .detail__title {
   min-width: 0;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .detail__number {
@@ -47,8 +50,11 @@
 }
 
 .detail__subject {
+  overflow: hidden;
   font-size: 15px;
   font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail__toggle {
