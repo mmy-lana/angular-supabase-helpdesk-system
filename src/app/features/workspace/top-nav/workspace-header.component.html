@@ -1,7 +1,7 @@
 <header class="header">
   <button
     type="button"
-    class="header__drawer zd-hide-on-desktop"
+    class="header__drawer zd-below-tablet"
     [attr.aria-expanded]="drawerOpen()"
     aria-label="Open navigation and account menu"
     (click)="drawerToggled.emit()">
@@ -36,6 +36,6 @@
 
   <button type="button" class="header__new-ticket" (click)="newTicket.emit()">
     <app-icon name="plus" [size]="16" />
-    <span class="zd-hide-on-mobile">New ticket</span>
+    <span class="zd-from-tablet">New ticket</span>
   </button>
 </header>

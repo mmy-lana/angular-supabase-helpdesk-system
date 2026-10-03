@@ -15,7 +15,7 @@
       <header class="detail__header">
         <button
           type="button"
-          class="detail__toggle zd-hide-on-wide-desktop"
+          class="detail__toggle zd-below-compact"
           aria-label="Ticket properties"
           [attr.aria-expanded]="propertiesOpen()"
           (click)="propertiesToggled.emit()">
@@ -27,8 +27,8 @@
           <h1 class="detail__subject zd-truncate">{{ current.subject }}</h1>
         </div>
 
-        <app-badge class="zd-hide-on-mobile" kind="status" [value]="current.status" />
-        <app-badge class="zd-hide-on-mobile" kind="priority" [value]="current.priority" />
+        <app-badge class="zd-mobile-only" kind="status" [value]="current.status" />
+        <app-badge class="zd-mobile-only" kind="priority" [value]="current.priority" />
 
         <button
           type="button"
@@ -64,7 +64,11 @@
   </section>
 
   <aside class="detail__context" [class.detail__context--open]="contextOpen()">
-    <app-ticket-customer-pane [ticket]="ticket()" (ticketRequested)="ticketRequested.emit($event)" />
+    <app-ticket-customer-pane
+      [ticket]="ticket()"
+      [dismissible]="contextOpen()"
+      (closed)="contextToggled.emit()"
+      (ticketRequested)="ticketRequested.emit($event)" />
   </aside>
 
   @if (contextOpen()) {

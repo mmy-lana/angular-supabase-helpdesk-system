@@ -1,4 +1,5 @@
 import {
+  DOCUMENT,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -271,7 +272,7 @@ export class DropdownComponent {
 
   private readonly triggerRef = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
   private readonly listboxRef = viewChild<ElementRef<HTMLElement>>('listbox');
-  private readonly document = inject(Document);
+  private readonly document = inject(DOCUMENT);
 
   protected readonly listboxId = `app-dropdown-list-${nextDropdownId++}`;
 

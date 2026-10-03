@@ -69,8 +69,10 @@ export class WorkspaceTabService {
   }
 
   openSearch(query: string): WorkspaceTab {
+    // The query lives in the tab id so the search tab survives re-renders and so
+    // two searches for different text are two different tabs.
     return this.open({
-      id: `search:${query.trim().toLowerCase()}`,
+      id: `search:${query.trim()}`,
       type: 'search',
       title: `Search: ${query.trim()}`,
       isDirty: false,

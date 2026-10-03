@@ -1,6 +1,6 @@
 <div class="table-wrap zd-scroll">
   @if (tickets().length > 0) {
-    <table class="table zd-hide-on-mobile">
+    <table class="table zd-from-tablet">
       <thead>
         <tr>
           @for (column of columns; track column.field) {
@@ -42,7 +42,7 @@
       </tbody>
     </table>
 
-    <ul class="cards zd-hide-on-desktop">
+    <ul class="cards zd-mobile-only">
       @for (ticket of tickets(); track ticket.id) {
         <li>
           <button type="button" class="cards__item" (click)="ticketSelected.emit(ticket.id)">

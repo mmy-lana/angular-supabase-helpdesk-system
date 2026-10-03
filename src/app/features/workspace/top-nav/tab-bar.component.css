@@ -78,7 +78,9 @@
   align-items: center;
   gap: 6px;
   flex: 0 0 auto;
-  margin: 6px 0 6px 8px;
+  min-width: var(--zd-touch-target);
+  min-height: var(--zd-touch-target);
+  margin: 2px 0 2px 8px;
   padding: 0 12px;
   border: 1px solid var(--zd-border);
   border-radius: var(--zd-radius-md);

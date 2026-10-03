@@ -75,7 +75,7 @@
           accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,text/plain,application/zip"
           (change)="onFilesSelected($any($event.target).files)" />
         <app-icon name="attachment" [size]="16" />
-        <span class="zd-hide-on-mobile">Attach</span>
+        <span class="zd-from-tablet">Attach</span>
         @if (uploading()) {
           <span class="composer__spinner" aria-hidden="true"></span>
         }

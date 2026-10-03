@@ -20,7 +20,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: var(--zd-touch-target);
   padding: 0 12px;
   border-bottom: 2px solid transparent;
   border-radius: var(--zd-radius-sm) var(--zd-radius-sm) 0 0;

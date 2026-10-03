@@ -183,34 +183,50 @@ select:focus-visible,
   z-index: var(--zd-z-overlay);
 }
 
-/* Visibility swaps. The shell picks one component per range, the classes keep
-   in-page furniture honest when a component is rendered on the wrong range. */
-@media (max-width: 767px) {
-  .zd-hide-on-mobile {
-    display: none !important;
-  }
+/* Visibility swaps. The shell picks one component per range; these classes keep
+   in-page furniture honest when a component is rendered on the wrong range.
+   `from-*` names the first width a thing appears at, `below-*` the width it
+   disappears from. */
+.zd-mobile-only {
+  display: none;
 }
 
 @media (min-width: 768px) {
-  .zd-hide-on-desktop {
+  .zd-mobile-only {
+    display: revert;
+  }
+
+  .zd-below-tablet {
     display: none !important;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .zd-hide-on-tablet {
-    display: none !important;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .zd-hide-on-compact-desktop {
+@media (min-width: 1024px) {
+  .zd-below-compact {
     display: none !important;
   }
 }
 
 @media (min-width: 1280px) {
-  .zd-hide-on-wide-desktop {
+  .zd-below-wide {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zd-from-tablet {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .zd-from-compact {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1279px) {
+  .zd-from-wide {
     display: none !important;
   }
 }

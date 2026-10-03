@@ -53,6 +53,8 @@
 
 .detail__toggle {
   display: inline-flex;
+  flex: 0 0 auto;
+  width: var(--zd-touch-target);
   align-items: center;
   justify-content: center;
   width: var(--zd-touch-target);
@@ -112,7 +114,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: var(--zd-z-overlay);
+    z-index: var(--zd-z-modal);
     width: 320px;
     box-shadow: var(--zd-shadow-md);
   }
@@ -123,7 +125,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--zd-z-overlay);
+    z-index: var(--zd-z-modal);
     width: 320px;
     box-shadow: var(--zd-shadow-md);
   }
@@ -142,7 +144,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--zd-z-overlay);
+    z-index: var(--zd-z-modal);
     width: 300px;
     box-shadow: var(--zd-shadow-md);
   }

@@ -9,6 +9,36 @@
   background-color: var(--zd-surface);
 }
 
+.requester__header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+}
+
+.requester__heading {
+  color: var(--zd-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.requester__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  margin: -8px -8px -8px 0;
+  border-radius: var(--zd-radius-sm);
+  color: var(--zd-text-secondary);
+}
+
+.requester__close:hover {
+  background-color: var(--zd-surface-sunken);
+}
+
 .requester__header {
   display: flex;
   align-items: center;

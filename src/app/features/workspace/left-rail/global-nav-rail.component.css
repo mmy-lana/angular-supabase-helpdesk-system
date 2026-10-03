@@ -67,17 +67,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--zd-green-action);
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  /* A 32 pixel avatar drawn inside a 44 pixel target: the rail is too narrow
+     for a bigger badge, but the tap area still has to be reachable. */
+  background: radial-gradient(circle at center, var(--zd-green-action) 0 16px, transparent 16px);
   color: #fff;
   font-size: 12px;
   font-weight: 600;
 }
 
 .rail__account:hover {
-  background-color: var(--zd-green-action-hover);
+  background: radial-gradient(circle at center, var(--zd-green-action-hover) 0 16px, transparent 16px);
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

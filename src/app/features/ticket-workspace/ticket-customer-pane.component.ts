@@ -29,8 +29,11 @@ export class TicketCustomerPaneComponent {
   private readonly tickets = inject(TicketService);
 
   readonly ticket = input.required<Ticket | null>();
+  /** Shows a close control when the pane is presented as a sheet rather than docked. */
+  readonly dismissible = input(false);
 
   readonly ticketRequested = output<string>();
+  readonly closed = output<void>();
 
   protected readonly requester = computed(() => this.ticket()?.requester ?? null);
   protected readonly history = this.tickets.history;

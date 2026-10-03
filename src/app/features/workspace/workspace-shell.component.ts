@@ -85,9 +85,10 @@ export class WorkspaceShellComponent {
     return tab?.type === 'ticket' ? 'Ticket conversation' : 'Tickets';
   });
 
-  protected readonly searchQuery = computed(() =>
-    this.activeTab()?.type === 'search' ? this.tickets.searchState().query : ''
-  );
+  protected readonly searchQuery = computed(() => {
+    const tab = this.activeTab();
+    return tab?.type === 'search' ? tab.id.slice('search:'.length) : '';
+  });
 
   protected readonly railItem = computed<RailItem>(() => {
     const tab = this.activeTab();
