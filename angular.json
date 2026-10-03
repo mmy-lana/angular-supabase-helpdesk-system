@@ -63,6 +63,10 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.demo.ts"
+                },
+                {
+                  "replace": "src/app/app.config.ts",
+                  "with": "src/app/app.config.demo.ts"
                 }
               ]
             }

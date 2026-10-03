@@ -17,5 +17,6 @@ export const environment: EnvironmentConfig = {
   useMockData: false,
   supabaseUrl: '',
   supabaseAnonKey: '',
-  demoAccounts: []
+  demoAccounts: [],
+  demoIdentities: []
 };

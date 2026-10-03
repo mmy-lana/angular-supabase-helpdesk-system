@@ -6,10 +6,15 @@ import { ProfileRow, UserRole } from '../models/database.types';
 import { HelpdeskMapper } from '../mappers/helpdesk.mapper';
 import { Profile } from '../models/helpdesk.models';
 import { clearStored, readStoredJson, writeStoredJson } from '../../shared/utils/browser-storage';
-import { MOCK_SESSION_KEY, findMockProfileByEmail } from './mock-fixtures';
 import { SupabaseService } from './supabase.service';
 
+/** Local storage key holding the showcase session address. */
+const MOCK_SESSION_KEY = 'MOCK_SESSION_V1';
+
 export type AuthStatus = 'initializing' | 'authenticated' | 'anonymous' | 'misconfigured';
+
+/** Showcase identities have no real join date; a fixed one keeps rendering stable. */
+const DEMO_IDENTITY_JOINED_AT = '2026-01-01T00:00:00.000Z';
 
 export interface RegisterOutcome {
   readonly requiresEmailConfirmation: boolean;
@@ -173,8 +178,8 @@ export class AuthStateService {
 
     if (environment.useMockData) {
       const storedEmail = readStoredJson<string>(MOCK_SESSION_KEY);
-      const profile = storedEmail ? findMockProfileByEmail(storedEmail) : null;
-      this.profileSignal.set(profile ? HelpdeskMapper.toProfile(profile) : null);
+      const profile = storedEmail ? this.mockProfileFor(storedEmail) : null;
+      this.profileSignal.set(profile);
       this.statusSignal.set('anonymous');
       return;
     }
@@ -253,14 +258,36 @@ export class AuthStateService {
     if (!account) {
       throw new Error('Those demo credentials are not part of this showcase. Pick one of the listed accounts.');
     }
-    const profile = findMockProfileByEmail(account.email);
+    const profile = this.mockProfileFor(account.email);
     if (!profile) {
       throw new Error(`The offline showcase has no profile for ${account.email}.`);
     }
 
     writeStoredJson(MOCK_SESSION_KEY, profile.email);
-    this.profileSignal.set(HelpdeskMapper.toProfile(profile));
+    this.profileSignal.set(profile);
     this.statusSignal.set('authenticated');
+  }
+
+  /**
+   * Resolves a showcase identity. The directory lives in the demo environment
+   * file, so this lookup has nothing to bundle in a production build.
+   */
+  private mockProfileFor(email: string): Profile | null {
+    const identity = environment.demoIdentities.find(
+      (candidate) => candidate.email.toLowerCase() === email.trim().toLowerCase()
+    );
+    if (!identity) {
+      return null;
+    }
+    return {
+      id: identity.id,
+      email: identity.email,
+      fullName: identity.fullName,
+      avatarUrl: null,
+      role: identity.role,
+      createdAt: DEMO_IDENTITY_JOINED_AT,
+      updatedAt: DEMO_IDENTITY_JOINED_AT
+    };
   }
 
   private describeAuthError(message: string): string {

@@ -26,5 +26,8 @@ export const environment: EnvironmentConfig = {
       email: 'customer@example.com',
       password: 'DevPassword123!'
     }
-  ]
+  ],
+  // The local instance is seeded by supabase/seed.sql, so no fixture profiles
+  // are needed here and none are shipped in this bundle.
+  demoIdentities: []
 };

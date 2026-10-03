@@ -8,15 +8,15 @@ import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from 
 import { appRoutes } from './app.routes';
 import { AuthStateService } from './core/services/auth-state.service';
 import { DataRepository } from './core/services/data-repository.interface';
-import { SupabaseDataRepository } from './core/services/supabase-data.repository';
+import { MockDataRepository } from './core/services/mock-data.repository';
 
 /**
- * Bootstrap configuration for every target that talks to a real backend.
+ * Bootstrap configuration for the offline showcase.
  *
- * The showcase uses `app.config.demo.ts`, which `ng build --configuration demo`
- * substitutes for this file. Keeping them apart is what leaves the mock backend,
- * its fixtures and its sample tickets out of a production bundle: the import
- * graph of this configuration only ever mentions the Supabase repository.
+ * `ng build --configuration demo` replaces `app.config.ts` with this file (see
+ * the `fileReplacements` entry in angular.json). Keeping the showcase wiring in
+ * its own module is what lets a production build leave the entire mock backend,
+ * its fixtures and its sample tickets out of the bundle.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,10 +28,8 @@ export const appConfig: ApplicationConfig = {
     ),
     {
       provide: DataRepository,
-      useClass: SupabaseDataRepository
+      useClass: MockDataRepository
     },
-    // Restores a stored session before the first route resolves, so a reload on a
-    // deep link does not bounce through the login screen.
     provideAppInitializer(() => inject(AuthStateService).ensureInitialized())
   ]
 };

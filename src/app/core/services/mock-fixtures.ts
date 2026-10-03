@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import {
   ProfileRow,
   TicketAuditLogRow,
@@ -9,24 +10,14 @@ import {
 } from '../models/database.types';
 
 /**
- * Synthetic directory and ticket history used by the offline `demo` build.
+ * Ticket history for the offline `demo` build, plus lookups into the identity
+ * directory that `environment.demo.ts` declares.
  *
- * Every address is an RFC 2606 reserved domain and every identity is fictional:
- * `agent@example.com` and `customer@example.com` are the two addresses the demo
- * login screen offers, the rest only exist to make lists and assignment pickers
- * look like a real workspace.
- *
- * Timestamps are generated relative to the moment the app loads, so the showcase
- * always looks like a workspace that was being worked on an hour ago.
+ * The directory itself lives in the environment file so a production bundle,
+ * which replaces it with an empty list, carries none of the showcase addresses.
+ * Timestamps here are generated relative to the moment the app loads, so the
+ * showcase always looks like a workspace that was being worked on an hour ago.
  */
-export const MOCK_PROFILE_IDS = {
-  admin: '5f2b9c10-0001-4c7a-9a11-000000000001',
-  agent: '5f2b9c10-0002-4c7a-9a11-000000000002',
-  secondAgent: '5f2b9c10-0003-4c7a-9a11-000000000003',
-  customer: '5f2b9c10-0004-4c7a-9a11-000000000004',
-  secondCustomer: '5f2b9c10-0005-4c7a-9a11-000000000005',
-  thirdCustomer: '5f2b9c10-0006-4c7a-9a11-000000000006'
-} as const;
 
 /** Local storage key holding the demo session email. */
 export const MOCK_SESSION_KEY = 'MOCK_SESSION_V1';
@@ -45,62 +36,41 @@ function daysAgo(days: number): string {
   return new Date(Date.now() - days * DAY).toISOString();
 }
 
-export const MOCK_PROFILES: readonly ProfileRow[] = Object.freeze([
-  {
-    id: MOCK_PROFILE_IDS.admin,
-    email: 'admin@example.org',
-    full_name: 'Priya Raman',
-    avatar_url: null,
-    role: 'admin',
-    created_at: daysAgo(420),
-    updated_at: daysAgo(40)
-  },
-  {
-    id: MOCK_PROFILE_IDS.agent,
-    email: 'agent@example.com',
-    full_name: 'Nina Okafor',
-    avatar_url: null,
-    role: 'agent',
-    created_at: daysAgo(180),
-    updated_at: daysAgo(12)
-  },
-  {
-    id: MOCK_PROFILE_IDS.secondAgent,
-    email: 'marcus.feld@example.org',
-    full_name: 'Marcus Feld',
-    avatar_url: null,
-    role: 'agent',
-    created_at: daysAgo(240),
-    updated_at: daysAgo(21)
-  },
-  {
-    id: MOCK_PROFILE_IDS.customer,
-    email: 'customer@example.com',
-    full_name: 'Tomas Eriksen',
-    avatar_url: null,
-    role: 'customer',
-    created_at: daysAgo(96),
-    updated_at: daysAgo(3)
-  },
-  {
-    id: MOCK_PROFILE_IDS.secondCustomer,
-    email: 'aiko.tanaka@example.org',
-    full_name: 'Aiko Tanaka',
-    avatar_url: null,
-    role: 'customer',
-    created_at: daysAgo(64),
-    updated_at: daysAgo(9)
-  },
-  {
-    id: MOCK_PROFILE_IDS.thirdCustomer,
-    email: 'samuel.ortiz@example.org',
-    full_name: 'Samuel Ortiz',
-    avatar_url: null,
-    role: 'customer',
-    created_at: daysAgo(31),
-    updated_at: daysAgo(6)
+function idForRole(role: ProfileRow['role'], ordinal = 0): string {
+  const matches = environment.demoIdentities.filter((identity) => identity.role === role);
+  const identity = matches[ordinal];
+  if (!identity) {
+    throw new Error(
+      `The showcase needs ${ordinal + 1} ${role} identit${ordinal === 0 ? 'y' : 'ies'}; declare them in src/environments/environment.demo.ts.`
+    );
   }
-]);
+  return identity.id;
+}
+
+/**
+ * The fixture keys point at the identities declared by the demo environment, so
+ * the two can never drift apart.
+ */
+export const MOCK_PROFILE_IDS = {
+  admin: idForRole('admin'),
+  agent: idForRole('agent'),
+  secondAgent: idForRole('agent', 1),
+  customer: idForRole('customer'),
+  secondCustomer: idForRole('customer', 1),
+  thirdCustomer: idForRole('customer', 2)
+} as const;
+
+export const MOCK_PROFILES: readonly ProfileRow[] = Object.freeze(
+  environment.demoIdentities.map((identity, index) => ({
+    id: identity.id,
+    email: identity.email,
+    full_name: identity.fullName,
+    avatar_url: null,
+    role: identity.role,
+    created_at: daysAgo(420 - index * 57),
+    updated_at: daysAgo(40 - index * 5)
+  }))
+);
 
 export function findMockProfileByEmail(email: string): ProfileRow | null {
   const needle = email.trim().toLowerCase();
