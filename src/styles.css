@@ -1,41 +1,107 @@
+/*
+ * Global tokens and base rules.
+ *
+ * Breakpoints are written out as plain media queries (767 / 1023 / 1279), and
+ * component swapping is driven by BreakpointObserver in Angular components. The
+ * two never disagree because both read the same four numbers.
+ */
+
 :root {
+  /* Brand */
   --zd-green-primary: #03363D;
+  --zd-green-primary-hover: #05474F;
   --zd-green-action: #138A04;
   --zd-green-action-hover: #107203;
+  --zd-green-ink: #FFFFFF;
+
+  /* Internal notes */
   --zd-yellow-bg: #FFF8E7;
   --zd-yellow-border: #FAD160;
   --zd-yellow-text: #704A00;
+
+  /* Neutrals */
   --zd-canvas: #F8F9F9;
   --zd-surface: #FFFFFF;
+  --zd-surface-raised: #FFFFFF;
+  --zd-surface-sunken: #F1F3F4;
   --zd-border: #D8DCDE;
   --zd-border-subtle: #E9EBED;
   --zd-text-main: #2F3941;
   --zd-text-secondary: #68737D;
   --zd-text-muted: #87929D;
+  --zd-text-inverse: #FFFFFF;
+
+  /* Status and priority accents */
   --zd-danger: #CC3340;
   --zd-danger-bg: #FFF0F1;
   --zd-blue: #1F73B7;
   --zd-blue-bg: #EDF7FF;
-  --zd-focus-ring: rgba(31, 115, 183, 0.4);
+  --zd-emerald: #008272;
+  --zd-emerald-bg: #E3F4F1;
+  --zd-amber: #B86E00;
+  --zd-amber-bg: #FFF6E5;
+  --zd-slate: #68737D;
+  --zd-slate-bg: #EFF1F2;
+  --zd-orange: #C25A16;
+  --zd-orange-bg: #FFF1E8;
+  --zd-focus-ring: rgba(31, 115, 183, 0.35);
+
+  /* Shape */
+  --zd-radius-sm: 3px;
+  --zd-radius-md: 6px;
+  --zd-radius-lg: 10px;
+  --zd-radius-pill: 999px;
+
+  /* Elevation */
+  --zd-shadow-sm: 0 1px 2px rgba(47, 57, 65, 0.12);
+  --zd-shadow-md: 0 4px 12px rgba(47, 57, 65, 0.14);
+  --zd-shadow-lg: 0 12px 32px rgba(47, 57, 65, 0.2);
+
+  /* Metrics */
+  --zd-rail-width: 52px;
+  --zd-rail-width-compact: 48px;
+  --zd-properties-width: 260px;
+  --zd-properties-width-compact: 240px;
+  --zd-requester-width: 280px;
+  --zd-header-height: 56px;
+  --zd-tabbar-height: 48px;
+  --zd-bottom-nav-height: 60px;
+  --zd-touch-target: 44px;
+  --zd-transition: 140ms cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Layering */
+  --zd-z-sticky: 20;
+  --zd-z-overlay: 60;
+  --zd-z-modal: 70;
+  --zd-z-toast: 90;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100dvh;
   min-height: 100dvh;
   background-color: var(--zd-canvas);
   color: var(--zd-text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
-input, textarea, select {
+/* 16px keeps iOS Safari from zooming the viewport when a field gains focus. */
+input,
+textarea,
+select {
   font-family: inherit;
   font-size: 16px;
   color: var(--zd-text-main);
@@ -48,10 +114,24 @@ button {
   background: none;
 }
 
-button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+a {
+  color: var(--zd-blue);
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--zd-blue);
   outline-offset: 1px;
 }
+
+::selection {
+  background: rgba(19, 138, 4, 0.18);
+}
+
+/* Utilities ------------------------------------------------------------- */
 
 .sr-only {
   position: absolute;
@@ -63,4 +143,85 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.zd-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zd-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--zd-border) transparent;
+}
+
+.zd-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.zd-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--zd-border);
+  border: 3px solid transparent;
+  border-radius: var(--zd-radius-pill);
+  background-clip: content-box;
+}
+
+.zd-divider {
+  height: 1px;
+  background-color: var(--zd-border-subtle);
+  border: 0;
+}
+
+.zd-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 57, 65, 0.45);
+  z-index: var(--zd-z-overlay);
+}
+
+/* Visibility swaps. The shell picks one component per range, the classes keep
+   in-page furniture honest when a component is rendered on the wrong range. */
+@media (max-width: 767px) {
+  .zd-hide-on-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .zd-hide-on-desktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .zd-hide-on-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .zd-hide-on-compact-desktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .zd-hide-on-wide-desktop {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

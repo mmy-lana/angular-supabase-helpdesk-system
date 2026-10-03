@@ -142,6 +142,26 @@ export function isTicketViewId(value: string): value is TicketViewId {
   return (TICKET_VIEW_IDS as readonly string[]).includes(value);
 }
 
+export const TICKET_STATUSES = ['new', 'open', 'pending', 'solved', 'closed'] as const;
+export function isTicketStatus(value: string): value is TicketStatus {
+  return (TICKET_STATUSES as readonly string[]).includes(value);
+}
+
+export const TICKET_PRIORITIES = ['low', 'normal', 'high', 'urgent'] as const;
+export function isTicketPriority(value: string): value is TicketPriority {
+  return (TICKET_PRIORITIES as readonly string[]).includes(value);
+}
+
+export const TICKET_TYPES = ['question', 'incident', 'problem', 'task'] as const;
+export function isTicketType(value: string): value is TicketType {
+  return (TICKET_TYPES as readonly string[]).includes(value);
+}
+
+export const USER_ROLES = ['customer', 'agent', 'admin'] as const;
+export function isUserRole(value: string): value is UserRole {
+  return (USER_ROLES as readonly string[]).includes(value);
+}
+
 export interface ViewDefinition {
   readonly id: TicketViewId;
   readonly label: string;
