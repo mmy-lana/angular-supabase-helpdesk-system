@@ -1,0 +1,30 @@
+<nav class="views" aria-label="Ticket views">
+  <header class="views__header">
+    <h2 class="views__heading">Views</h2>
+    @if (dismissible()) {
+      <button type="button" class="views__close" aria-label="Close views" (click)="dismissed.emit()">
+        <app-icon name="close" [size]="18" />
+      </button>
+    }
+  </header>
+
+  <ul class="views__list">
+    @for (view of views(); track view.id) {
+      <li>
+        <button
+          type="button"
+          class="views__item"
+          [class.views__item--active]="view.id === activeView()"
+          [attr.aria-current]="view.id === activeView() ? 'page' : null"
+          (click)="viewSelected.emit(view.id)">
+          <app-icon [name]="view.icon" [size]="16" />
+          <span class="views__label">
+            <span class="views__label-title">{{ view.label }}</span>
+            <span class="views__label-description">{{ view.description }}</span>
+          </span>
+          <span class="views__count" [attr.aria-label]="counts()[view.id] + ' tickets'">{{ counts()[view.id] }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+</nav>
