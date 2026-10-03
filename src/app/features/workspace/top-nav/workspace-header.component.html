@@ -1,0 +1,41 @@
+<header class="header">
+  <button
+    type="button"
+    class="header__drawer zd-hide-on-desktop"
+    [attr.aria-expanded]="drawerOpen()"
+    aria-label="Open navigation and account menu"
+    (click)="drawerToggled.emit()">
+    <app-icon name="customers" [size]="20" />
+  </button>
+
+  <div class="header__titles">
+    <h1 class="header__title zd-truncate">{{ title() }}</h1>
+    @if (subtitle(); as text) {
+      <p class="header__subtitle zd-truncate">{{ text }}</p>
+    }
+  </div>
+
+  <div class="header__search">
+    <span class="header__search-icon"><app-icon name="search" [size]="16" /></span>
+    <input
+      #searchField
+      type="search"
+      class="header__search-input"
+      placeholder="Search tickets"
+      aria-label="Search tickets by subject"
+      [value]="draft()"
+      [disabled]="searchDisabled()"
+      (input)="onInput($any($event.target).value)"
+      (keydown)="onKeydown($event)" />
+    @if (draft()) {
+      <button type="button" class="header__search-clear" aria-label="Clear search" (click)="clear()">
+        <app-icon name="close" [size]="14" />
+      </button>
+    }
+  </div>
+
+  <button type="button" class="header__new-ticket" (click)="newTicket.emit()">
+    <app-icon name="plus" [size]="16" />
+    <span class="zd-hide-on-mobile">New ticket</span>
+  </button>
+</header>

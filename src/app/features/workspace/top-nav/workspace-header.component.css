@@ -1,0 +1,126 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--zd-header-height);
+  padding: 0 16px;
+  background-color: var(--zd-surface);
+  border-bottom: 1px solid var(--zd-border);
+}
+
+.header__drawer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  margin-left: -8px;
+  border-radius: var(--zd-radius-sm);
+  color: var(--zd-text-secondary);
+}
+
+.header__titles {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.header__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.header__subtitle {
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}
+
+.header__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  max-width: 420px;
+  margin-left: auto;
+}
+
+.header__search-icon {
+  position: absolute;
+  left: 10px;
+  display: inline-flex;
+  color: var(--zd-text-secondary);
+  pointer-events: none;
+}
+
+.header__search-input {
+  width: 100%;
+  min-height: var(--zd-touch-target);
+  padding: 0 40px 0 34px;
+  border: 1px solid var(--zd-border);
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-surface-sunken);
+  color: var(--zd-text-main);
+}
+
+.header__search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.header__search-input:focus {
+  background-color: var(--zd-surface);
+}
+
+.header__search-clear {
+  position: absolute;
+  right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  border-radius: var(--zd-radius-sm);
+  color: var(--zd-text-secondary);
+}
+
+.header__search-clear:hover {
+  background-color: var(--zd-border-subtle);
+}
+
+.header__new-ticket {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-height: var(--zd-touch-target);
+  padding: 0 14px;
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-green-action);
+  color: var(--zd-green-ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header__new-ticket:hover {
+  background-color: var(--zd-green-action-hover);
+}
+
+@media (max-width: 767px) {
+  .header {
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+  .header__titles {
+    display: none;
+  }
+
+  .header__search {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .header__new-ticket {
+    padding: 0 12px;
+  }
+}

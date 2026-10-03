@@ -1,0 +1,55 @@
+<div class="drawer-overlay" (click)="closed.emit()"></div>
+
+<aside class="drawer" role="dialog" aria-modal="true" aria-label="Account and workspace" (keydown.escape)="closed.emit()">
+  <header class="drawer__header">
+    <h2 class="drawer__title">Account</h2>
+    <button type="button" class="drawer__close" aria-label="Close menu" (click)="closed.emit()">
+      <app-icon name="close" [size]="18" />
+    </button>
+  </header>
+
+  @if (user(); as profile) {
+    <section class="drawer__profile">
+      <span class="drawer__avatar" aria-hidden="true">{{ profile.fullName.charAt(0).toUpperCase() }}</span>
+      <div class="drawer__identity">
+        <p class="drawer__name">{{ profile.fullName }}</p>
+        <p class="drawer__email">{{ profile.email }}</p>
+        <span class="drawer__role">{{ roleLabel() }}</span>
+      </div>
+    </section>
+  }
+
+  @if (showDemoAccounts) {
+    <section class="drawer__section">
+      <h3 class="drawer__section-title">Switch account</h3>
+      <p class="drawer__hint">Signs you in as another bundled identity.</p>
+      @for (account of demoAccounts; track account.email) {
+        <button
+          type="button"
+          class="drawer__row"
+          [class.drawer__row--active]="account.email === user()?.email"
+          [disabled]="switchingAccount()"
+          (click)="switchAccount(account.email, account.password)">
+          <span class="drawer__row-label">{{ account.label }}</span>
+          <span class="drawer__row-meta">{{ account.email }}</span>
+        </button>
+      }
+    </section>
+  }
+
+  @if (isShowcase) {
+    <section class="drawer__section">
+      <h3 class="drawer__section-title">Showcase</h3>
+      <p class="drawer__hint">
+        This build runs entirely in the browser. Nothing here is stored on a server and nothing is secured.
+      </p>
+      <button type="button" class="drawer__row" (click)="resetShowcase()">
+        <span class="drawer__row-label">Reset sample tickets</span>
+      </button>
+    </section>
+  }
+
+  <footer class="drawer__footer">
+    <button type="button" class="drawer__sign-out" (click)="signOut()">Sign out</button>
+  </footer>
+</aside>

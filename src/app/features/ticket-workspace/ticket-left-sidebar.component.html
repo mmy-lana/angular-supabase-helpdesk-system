@@ -1,0 +1,165 @@
+<section class="properties" aria-label="Ticket properties">
+  @if (ticket(); as current) {
+    <header class="properties__header">
+      <h2 class="properties__heading">Properties</h2>
+      @if (dismissible()) {
+        <button type="button" class="properties__close" aria-label="Close properties" (click)="closed.emit()">
+          <app-icon name="close" [size]="18" />
+        </button>
+      }
+    </header>
+
+    @if (isClosed()) {
+      <p class="properties__notice">
+        <app-icon name="lock" [size]="14" />
+        Closed tickets are read only.
+      </p>
+    }
+
+    <div class="properties__group">
+      <span class="properties__label" id="subject-label">Subject</span>
+      @if (canEdit()) {
+        <input
+          type="text"
+          class="properties__subject"
+          aria-labelledby="subject-label"
+          maxlength="255"
+          [disabled]="isClosed() || savingSubject()"
+          [value]="subjectDraft()"
+          (input)="onSubjectInput($any($event.target).value)"
+          (blur)="saveSubject()"
+          (keydown.enter)="saveSubject()" />
+      } @else {
+        <p class="properties__value">{{ current.subject }}</p>
+      }
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Status</span>
+      @if (canEdit()) {
+        <app-dropdown
+          ariaLabel="Status"
+          [options]="statusOptions"
+          [value]="current.status"
+          [disabled]="controlsDisabled()"
+          (valueChange)="onStatusChange($event)" />
+      } @else {
+        <p class="properties__value">{{ current.status }}</p>
+      }
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Priority</span>
+      @if (canEdit()) {
+        <app-dropdown
+          ariaLabel="Priority"
+          [options]="priorityOptions"
+          [value]="current.priority"
+          [disabled]="controlsDisabled()"
+          (valueChange)="onPriorityChange($event)" />
+      } @else {
+        <p class="properties__value">{{ current.priority }}</p>
+      }
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Type</span>
+      @if (canEdit()) {
+        <app-dropdown
+          ariaLabel="Type"
+          [options]="typeOptions"
+          [value]="current.type"
+          [disabled]="controlsDisabled()"
+          (valueChange)="onTypeChange($event)" />
+      } @else {
+        <p class="properties__value">{{ current.type }}</p>
+      }
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Assignee</span>
+      @if (canEdit()) {
+        <app-dropdown
+          ariaLabel="Assignee"
+          [options]="assigneeOptions()"
+          [value]="assigneeValue()"
+          [disabled]="controlsDisabled()"
+          (valueChange)="onAssigneeChange($event)" />
+
+        @if (canClaim()) {
+          <app-button class="properties__claim" variant="primary" label="Assign to me" icon="check" (pressed)="claim()" />
+        }
+      } @else {
+        <p class="properties__value">{{ current.assignee?.fullName ?? 'Unassigned' }}</p>
+      }
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Requester</span>
+      <p class="properties__value">{{ current.requester?.fullName ?? 'Unknown' }}</p>
+    </div>
+
+    <div class="properties__group">
+      <span class="properties__label">Tags</span>
+      @if (current.tags.length > 0) {
+        <ul class="properties__tags">
+          @for (tag of current.tags; track tag) {
+            <li class="properties__tag">
+              <span class="zd-truncate">{{ tag }}</span>
+              @if (canEdit() && !isClosed()) {
+                <button
+                  type="button"
+                  class="properties__tag-remove"
+                  [attr.aria-label]="'Remove tag ' + tag"
+                  (click)="removeTag(tag)">
+                  <app-icon name="close" [size]="12" />
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="properties__empty">No tags</p>
+      }
+
+      @if (canEdit() && !isClosed()) {
+        <form class="properties__tag-form" (submit)="$event.preventDefault(); addTag()">
+          <input
+            type="text"
+            class="properties__tag-input"
+            placeholder="Add a tag"
+            aria-label="Add a tag"
+            maxlength="32"
+            [value]="tagDraft()"
+            (input)="tagDraft.set($any($event.target).value)" />
+          <button type="submit" class="properties__tag-add" aria-label="Add tag" [disabled]="!tagDraft().trim()">
+            <app-icon name="plus" [size]="16" />
+          </button>
+        </form>
+      }
+    </div>
+
+    <dl class="properties__facts">
+      <div>
+        <dt>Ticket</dt>
+        <dd>#{{ current.ticketNumber }}</dd>
+      </div>
+      <div>
+        <dt>Created</dt>
+        <dd>{{ current.createdAt | timeAgo }}</dd>
+      </div>
+      <div>
+        <dt>Updated</dt>
+        <dd>{{ current.updatedAt | timeAgo }}</dd>
+      </div>
+      @if (current.solvedAt) {
+        <div>
+          <dt>Solved</dt>
+          <dd>{{ current.solvedAt | timeAgo }}</dd>
+        </div>
+      }
+    </dl>
+  } @else {
+    <p class="properties__placeholder">Open a ticket to see its properties.</p>
+  }
+</section>

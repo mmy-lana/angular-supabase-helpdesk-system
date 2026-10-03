@@ -1,0 +1,39 @@
+<article
+  class="comment"
+  [class.comment--internal]="comment().isInternal"
+  [class.comment--own]="ownMessage()"
+  [attr.aria-label]="(comment().isInternal ? 'Internal note from ' : 'Reply from ') + authorName()">
+  <header class="comment__header">
+    <span class="comment__avatar" aria-hidden="true">{{ initials() }}</span>
+    <span class="comment__author">{{ authorName() }}</span>
+
+    @if (comment().isInternal) {
+      <span class="comment__badge">
+        <app-icon name="lock" [size]="12" />
+        Internal note
+      </span>
+    }
+
+    <time class="comment__time" [attr.datetime]="comment().createdAt">{{ comment().createdAt | timeAgo }}</time>
+  </header>
+
+  @if (comment().isInternal) {
+    <p class="comment__notice">Only agents can see this note.</p>
+  }
+
+  <p class="comment__body">{{ comment().body }}</p>
+
+  @if (comment().attachments.length > 0) {
+    <ul class="comment__attachments">
+      @for (attachment of comment().attachments; track attachment.id) {
+        <li>
+          <button type="button" class="comment__attachment" (click)="openAttachment(attachment.filePath)">
+            <app-icon name="attachment" [size]="16" />
+            <span class="comment__attachment-name zd-truncate">{{ attachment.name }}</span>
+            <span class="comment__attachment-size">{{ formatSize(attachment.size) }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</article>

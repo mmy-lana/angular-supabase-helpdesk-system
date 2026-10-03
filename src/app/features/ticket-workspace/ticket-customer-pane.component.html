@@ -1,0 +1,61 @@
+<section class="requester" aria-label="Requester details">
+  @if (requester(); as profile) {
+    <header class="requester__header">
+      <span class="requester__avatar" aria-hidden="true">{{ profile.fullName.charAt(0).toUpperCase() }}</span>
+      <div class="requester__identity">
+        <p class="requester__name zd-truncate">{{ profile.fullName }}</p>
+        <p class="requester__email zd-truncate">{{ profile.email }}</p>
+      </div>
+    </header>
+
+    <dl class="requester__facts">
+      <div>
+        <dt>Role</dt>
+        <dd>{{ roleLabel() }}</dd>
+      </div>
+      <div>
+        <dt>Customer since</dt>
+        <dd>{{ profile.createdAt | timeAgo }}</dd>
+      </div>
+      <div>
+        <dt>Tickets raised</dt>
+        <dd>{{ history().tickets.length }}</dd>
+      </div>
+    </dl>
+
+    <h3 class="requester__section-title">Earlier tickets</h3>
+
+    @switch (history().state) {
+      @case ('loading') {
+        <p class="requester__placeholder">Loading ticket history…</p>
+      }
+      @case ('error') {
+        <p class="requester__placeholder">Ticket history could not be loaded.</p>
+      }
+      @default {
+        @if (history().tickets.length > 0) {
+          <ul class="requester__history">
+            @for (past of history().tickets; track past.id) {
+              <li>
+                <button type="button" class="requester__history-item" (click)="ticketRequested.emit(past.id)">
+                  <span class="requester__history-subject zd-truncate">{{ past.subject }}</span>
+                  <span class="requester__history-meta">
+                    <app-badge kind="status" [value]="past.status" />
+                    <time [attr.datetime]="past.updatedAt">{{ past.updatedAt | timeAgo }}</time>
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="requester__placeholder">
+            <app-icon name="check" [size]="14" />
+            No other tickets from this customer.
+          </p>
+        }
+      }
+    }
+  } @else {
+    <p class="requester__placeholder">Requester details are not available for this ticket.</p>
+  }
+</section>

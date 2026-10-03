@@ -1,0 +1,107 @@
+<section class="composer" [class.composer--internal]="mode() === 'note'" aria-label="Reply to this ticket">
+  <div class="composer__tabs" role="tablist" aria-label="Message type">
+    <button
+      type="button"
+      role="tab"
+      class="composer__tab"
+      [class.composer__tab--active]="mode() === 'reply'"
+      [attr.aria-selected]="mode() === 'reply'"
+      (click)="selectMode('reply')">
+      <app-icon name="send" [size]="14" />
+      Public reply
+    </button>
+
+    @if (canWriteInternalNotes()) {
+      <button
+        type="button"
+        role="tab"
+        class="composer__tab"
+        [class.composer__tab--active]="mode() === 'note'"
+        [class.composer__tab--note]="mode() === 'note'"
+        [attr.aria-selected]="mode() === 'note'"
+        (click)="selectMode('note')">
+        <app-icon name="lock" [size]="14" />
+        Internal note
+      </button>
+    }
+  </div>
+
+  @if (isClosed()) {
+    <p class="composer__closed">
+      <app-icon name="lock" [size]="16" />
+      This ticket is closed. Closed tickets cannot be reopened, so no further replies can be added.
+    </p>
+  } @else {
+    <textarea
+      class="composer__input"
+      rows="3"
+      [class.composer__input--internal]="mode() === 'note'"
+      [placeholder]="mode() === 'note' ? 'Write a note for your colleagues only' : 'Write a reply to the customer'"
+      [attr.aria-label]="mode() === 'note' ? 'Internal note' : 'Public reply'"
+      [disabled]="submitting()"
+      [value]="body()"
+      (input)="onInput($any($event.target).value)"
+      (keydown)="onComposerKeydown($event)"></textarea>
+
+    @if (attachments().length > 0) {
+      <ul class="composer__attachments">
+        @for (attachment of attachments(); track attachment.filePath) {
+          <li class="composer__chip">
+            <app-icon name="attachment" [size]="14" />
+            <span class="zd-truncate">{{ attachment.name }}</span>
+            <button
+              type="button"
+              class="composer__chip-remove"
+              [attr.aria-label]="'Remove ' + attachment.name"
+              (click)="removeAttachment(attachment.filePath)">
+              <app-icon name="close" [size]="12" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (errorMessage(); as message) {
+      <p class="composer__error" role="alert">{{ message }}</p>
+    }
+
+    <div class="composer__actions">
+      <label class="composer__attach">
+        <input
+          #fileInput
+          type="file"
+          multiple
+          class="sr-only"
+          accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,text/plain,application/zip"
+          (change)="onFilesSelected($any($event.target).files)" />
+        <app-icon name="attachment" [size]="16" />
+        <span class="zd-hide-on-mobile">Attach</span>
+        @if (uploading()) {
+          <span class="composer__spinner" aria-hidden="true"></span>
+        }
+      </label>
+
+      @if (mode() === 'reply' && canWriteInternalNotes()) {
+        <app-dropdown
+          class="composer__status"
+          size="sm"
+          align="end"
+          ariaLabel="Status after sending"
+          [options]="statusOptions"
+          [value]="statusAfterSend()"
+          (valueChange)="onStatusSelected($event)" />
+      }
+
+      <app-button
+        class="composer__submit"
+        [variant]="mode() === 'note' ? 'internal' : 'primary'"
+        [icon]="mode() === 'note' ? 'lock' : 'send'"
+        [label]="mode() === 'note' ? 'Add note' : 'Send reply'"
+        [loading]="submitting()"
+        [disabled]="!canSubmit()"
+        (pressed)="submit()" />
+    </div>
+
+    <p class="composer__hint">Press Ctrl or &#8984; + Enter to send</p>
+  }
+</section>

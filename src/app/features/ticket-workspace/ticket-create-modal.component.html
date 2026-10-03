@@ -1,0 +1,114 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="dismiss()"></div>
+
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="new-ticket-title" (keydown.escape)="dismiss()">
+    <header class="modal__header">
+      <h2 class="modal__title" id="new-ticket-title">New ticket</h2>
+      <button type="button" class="modal__close" aria-label="Close" (click)="dismiss()">
+        <app-icon name="close" [size]="18" />
+      </button>
+    </header>
+
+    <form class="modal__body" (submit)="$event.preventDefault(); submit()">
+      <div class="modal__field">
+        <label class="modal__label" for="ticket-subject">Subject</label>
+        <input
+          id="ticket-subject"
+          type="text"
+          class="modal__input"
+          [class.modal__input--invalid]="errors()['subject']"
+          maxlength="255"
+          autocomplete="off"
+          [attr.aria-invalid]="errors()['subject'] ? true : null"
+          [attr.aria-describedby]="errors()['subject'] ? 'ticket-subject-error' : null"
+          [value]="subject()"
+          (input)="onSubjectInput($any($event.target).value)" />
+        @if (errors()['subject']; as message) {
+          <p class="modal__error" id="ticket-subject-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="modal__field">
+        <label class="modal__label" for="ticket-body">Description</label>
+        <textarea
+          id="ticket-body"
+          rows="6"
+          class="modal__input modal__input--area"
+          [class.modal__input--invalid]="errors()['body']"
+          [attr.aria-invalid]="errors()['body'] ? true : null"
+          [attr.aria-describedby]="errors()['body'] ? 'ticket-body-error' : null"
+          placeholder="What happened, what was expected, and anything you already tried."
+          [value]="body()"
+          (input)="onBodyInput($any($event.target).value)"></textarea>
+        @if (errors()['body']; as message) {
+          <p class="modal__error" id="ticket-body-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="modal__row">
+        <div class="modal__field">
+          <span class="modal__label" id="ticket-priority-label">Priority</span>
+          <app-dropdown
+            ariaLabel="Priority"
+            [options]="priorityOptions"
+            [value]="priority()"
+            (valueChange)="onPriorityChange($event)" />
+        </div>
+
+        <div class="modal__field">
+          <span class="modal__label">Type</span>
+          <app-dropdown
+            ariaLabel="Type"
+            [options]="typeOptions"
+            [value]="type()"
+            (valueChange)="onTypeChange($event)" />
+        </div>
+      </div>
+
+      @if (canAssign()) {
+        <div class="modal__field">
+          <span class="modal__label">Assignee</span>
+          <app-dropdown
+            ariaLabel="Assignee"
+            [options]="assigneeOptions()"
+            [value]="assigneeId()"
+            (valueChange)="onAssigneeChange($event)" />
+        </div>
+
+        <div class="modal__field">
+          <span class="modal__label">Tags</span>
+          @if (tags().length > 0) {
+            <ul class="modal__tags">
+              @for (tag of tags(); track tag) {
+                <li class="modal__tag">
+                  <span>{{ tag }}</span>
+                  <button type="button" class="modal__tag-remove" [attr.aria-label]="'Remove tag ' + tag" (click)="removeTag(tag)">
+                    <app-icon name="close" [size]="12" />
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+          <form class="modal__tag-form" (submit)="$event.preventDefault(); addTag()">
+            <input
+              type="text"
+              class="modal__input"
+              placeholder="billing, api, login"
+              aria-label="Add a tag"
+              maxlength="32"
+              [value]="tagDraft()"
+              (input)="tagDraft.set($any($event.target).value)" />
+            <button type="button" class="modal__tag-add" aria-label="Add tag" [disabled]="!tagDraft().trim()" (click)="addTag()">
+              <app-icon name="plus" [size]="16" />
+            </button>
+          </form>
+        </div>
+      }
+
+      <footer class="modal__footer">
+        <app-button variant="ghost" label="Cancel" (pressed)="dismiss()" />
+        <app-button variant="primary" icon="plus" label="Create ticket" [loading]="submitting()" (pressed)="submit()" />
+      </footer>
+    </form>
+  </div>
+}

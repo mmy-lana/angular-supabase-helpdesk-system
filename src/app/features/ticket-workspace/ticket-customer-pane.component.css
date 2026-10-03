@@ -1,0 +1,120 @@
+.requester {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--zd-surface);
+}
+
+.requester__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.requester__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--zd-green-primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.requester__identity {
+  min-width: 0;
+}
+
+.requester__name {
+  font-weight: 600;
+}
+
+.requester__email {
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}
+
+.requester__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.requester__facts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.requester__facts dt {
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}
+
+.requester__facts dd {
+  font-size: 13px;
+}
+
+.requester__section-title {
+  padding-top: 8px;
+  border-top: 1px solid var(--zd-border-subtle);
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.requester__history {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+}
+
+.requester__history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--zd-border-subtle);
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-surface);
+  text-align: left;
+}
+
+.requester__history-item:hover {
+  border-color: var(--zd-border);
+  background-color: var(--zd-surface-sunken);
+}
+
+.requester__history-subject {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.requester__history-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--zd-text-secondary);
+  font-size: 11px;
+}
+
+.requester__placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--zd-text-secondary);
+  font-size: 13px;
+}

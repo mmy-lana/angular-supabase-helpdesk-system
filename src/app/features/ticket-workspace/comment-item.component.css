@@ -1,0 +1,125 @@
+.comment {
+  padding: 14px 16px;
+  border: 1px solid var(--zd-border-subtle);
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-surface);
+}
+
+.comment--internal {
+  background-color: var(--zd-yellow-bg);
+  border-color: var(--zd-yellow-border);
+}
+
+.comment__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.comment__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--zd-green-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.comment--own .comment__avatar {
+  background-color: var(--zd-green-action);
+}
+
+.comment--internal .comment__avatar {
+  background-color: var(--zd-yellow-text);
+}
+
+.comment__author {
+  font-weight: 600;
+}
+
+.comment--internal .comment__author {
+  color: var(--zd-yellow-text);
+}
+
+.comment__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border: 1px solid var(--zd-yellow-border);
+  border-radius: var(--zd-radius-pill);
+  background-color: #fff;
+  color: var(--zd-yellow-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.comment__time {
+  margin-left: auto;
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}
+
+.comment--internal .comment__time {
+  color: var(--zd-yellow-text);
+}
+
+.comment__notice {
+  margin-bottom: 6px;
+  color: var(--zd-yellow-text);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.comment__body {
+  color: var(--zd-text-main);
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comment__attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  list-style: none;
+}
+
+.comment__attachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--zd-touch-target);
+  padding: 0 10px;
+  border: 1px solid var(--zd-border);
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-surface);
+  color: var(--zd-text-main);
+  font-size: 13px;
+  text-align: left;
+}
+
+.comment__attachment:hover {
+  background-color: var(--zd-surface-sunken);
+}
+
+.comment__attachment-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.comment__attachment-size {
+  flex: 0 0 auto;
+  color: var(--zd-text-secondary);
+  font-size: 12px;
+}

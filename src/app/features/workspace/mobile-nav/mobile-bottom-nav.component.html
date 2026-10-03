@@ -1,0 +1,14 @@
+<nav class="dock" aria-label="Primary">
+  @for (button of buttons; track button.id) {
+    <button
+      type="button"
+      class="dock__item"
+      [class.dock__item--active]="activeItem() === button.id"
+      [class.dock__item--primary]="button.id === 'new-ticket'"
+      [attr.aria-current]="activeItem() === button.id ? 'page' : null"
+      (click)="itemSelected.emit(button.id)">
+      <app-icon [name]="button.icon" [size]="20" />
+      <span class="dock__label">{{ button.label }}</span>
+    </button>
+  }
+</nav>

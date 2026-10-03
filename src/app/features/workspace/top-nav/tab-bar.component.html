@@ -1,0 +1,32 @@
+<div class="tab-bar" role="tablist" aria-label="Open items">
+  @for (tab of tabs(); track trackTab($index, tab); let index = $index) {
+    <div
+      class="tab"
+      role="tab"
+      [class.tab--active]="tab.id === activeTabId()"
+      [attr.aria-selected]="tab.id === activeTabId()"
+      [attr.tabindex]="tab.id === activeTabId() ? 0 : -1"
+      (click)="tabSelected.emit(tab.id)"
+      (keydown)="onKeydown($event, index)">
+      <app-icon [name]="tab.icon" [size]="16" />
+      <span class="tab__title zd-truncate">{{ tab.title }}</span>
+      @if (tab.isDirty) {
+        <span class="tab__dirty" [attr.aria-label]="tab.title + ' has unsaved changes'" role="img"></span>
+      }
+      <span class="tab__close">
+        <button
+          type="button"
+          class="tab__close-button"
+          [attr.aria-label]="'Close ' + tab.title"
+          (click)="tabClosed.emit(tab.id); $event.stopPropagation()">
+          <app-icon name="close" [size]="14" />
+        </button>
+      </span>
+    </div>
+  }
+
+  <button type="button" class="tab-bar__new" (click)="newTicket.emit()">
+    <app-icon name="plus" [size]="16" />
+    <span class="zd-hide-on-mobile">New ticket</span>
+  </button>
+</div>

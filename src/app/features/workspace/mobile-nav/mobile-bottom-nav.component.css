@@ -1,0 +1,32 @@
+.dock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: calc(var(--zd-bottom-nav-height) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: var(--zd-surface);
+  border-top: 1px solid var(--zd-border);
+}
+
+.dock__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--zd-touch-target);
+  color: var(--zd-text-secondary);
+  font-size: 11px;
+}
+
+.dock__item--active {
+  color: var(--zd-green-primary);
+  font-weight: 600;
+}
+
+.dock__item--primary {
+  color: var(--zd-green-action);
+}
+
+.dock__label {
+  line-height: 1.2;
+}

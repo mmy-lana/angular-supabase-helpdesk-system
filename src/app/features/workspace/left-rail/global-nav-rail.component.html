@@ -1,0 +1,59 @@
+<nav class="rail" aria-label="Workspace sections">
+  <span class="rail__mark" aria-hidden="true">HD</span>
+
+  <ul class="rail__items">
+    <li>
+      <button
+        type="button"
+        class="rail__item"
+        [class.rail__item--active]="activeItem() === 'views'"
+        [attr.aria-current]="activeItem() === 'views' ? 'page' : null"
+        title="Ticket views"
+        aria-label="Ticket views"
+        (click)="itemSelected.emit('views')">
+        <app-icon name="table" [size]="22" />
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        class="rail__item"
+        [class.rail__item--active]="activeItem() === 'search'"
+        [attr.aria-current]="activeItem() === 'search' ? 'page' : null"
+        title="Search tickets"
+        aria-label="Search tickets"
+        (click)="itemSelected.emit('search')">
+        <app-icon name="search" [size]="22" />
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        class="rail__item"
+        title="New ticket"
+        aria-label="Create a new ticket"
+        (click)="itemSelected.emit('new-ticket')">
+        <app-icon name="plus" [size]="22" />
+      </button>
+    </li>
+  </ul>
+
+  <div class="rail__footer">
+    <button
+      type="button"
+      class="rail__item"
+      title="Settings"
+      aria-label="Workspace settings"
+      (click)="settingsRequested.emit()">
+      <app-icon name="settings" [size]="22" />
+    </button>
+    <button
+      type="button"
+      class="rail__account"
+      [attr.title]="accountName()"
+      [attr.aria-label]="'Account: ' + accountName()"
+      (click)="accountRequested.emit()">
+      {{ initials() }}
+    </button>
+  </div>
+</nav>

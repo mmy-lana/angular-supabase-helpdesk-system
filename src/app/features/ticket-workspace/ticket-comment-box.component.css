@@ -1,0 +1,192 @@
+.composer {
+  border: 1px solid var(--zd-border);
+  border-radius: var(--zd-radius-md);
+  background-color: var(--zd-surface);
+  transition: border-color var(--zd-transition), background-color var(--zd-transition);
+}
+
+.composer--internal {
+  background-color: var(--zd-yellow-bg);
+  border-color: var(--zd-yellow-border);
+}
+
+.composer__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px 0;
+}
+
+.composer__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--zd-radius-sm) var(--zd-radius-sm) 0 0;
+  color: var(--zd-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.composer__tab:hover {
+  color: var(--zd-text-main);
+}
+
+.composer__tab--active {
+  border-bottom-color: var(--zd-green-action);
+  color: var(--zd-text-main);
+}
+
+.composer__tab--active.composer__tab--note {
+  border-bottom-color: var(--zd-yellow-text);
+  color: var(--zd-yellow-text);
+}
+
+.composer__input {
+  display: block;
+  width: 100%;
+  min-height: 92px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--zd-text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.composer__input--internal {
+  color: var(--zd-yellow-text);
+}
+
+.composer__input:focus {
+  outline: none;
+}
+
+.composer:focus-within {
+  border-color: var(--zd-blue);
+}
+
+.composer--internal:focus-within {
+  border-color: var(--zd-yellow-border);
+}
+
+.composer__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 12px 8px;
+  list-style: none;
+}
+
+.composer__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  padding: 2px 2px 2px 8px;
+  border: 1px solid var(--zd-border);
+  border-radius: var(--zd-radius-pill);
+  background-color: var(--zd-surface);
+  font-size: 12px;
+}
+
+.composer__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--zd-touch-target);
+  height: var(--zd-touch-target);
+  border-radius: 50%;
+  color: var(--zd-text-secondary);
+}
+
+.composer__chip-remove:hover {
+  background-color: var(--zd-surface-sunken);
+  color: var(--zd-text-main);
+}
+
+.composer__error {
+  padding: 0 12px 8px;
+  color: var(--zd-danger);
+  font-size: 13px;
+}
+
+.composer__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--zd-border-subtle);
+}
+
+.composer--internal .composer__actions {
+  border-top-color: var(--zd-yellow-border);
+}
+
+.composer__attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--zd-touch-target);
+  padding: 0 10px;
+  border-radius: var(--zd-radius-md);
+  color: var(--zd-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.composer__attach:hover {
+  background-color: var(--zd-surface-sunken);
+  color: var(--zd-text-main);
+}
+
+.composer__status {
+  width: 180px;
+  margin-left: auto;
+}
+
+.composer__submit {
+  margin-left: auto;
+}
+
+.composer__status + .composer__submit {
+  margin-left: 0;
+}
+
+.composer__spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: composer-spin 640ms linear infinite;
+}
+
+.composer__hint {
+  padding: 0 12px 8px;
+  color: var(--zd-text-muted);
+  font-size: 11px;
+}
+
+.composer__closed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  color: var(--zd-text-secondary);
+  font-size: 13px;
+}
+
+@keyframes composer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .composer__status {
+    width: 132px;
+  }
+}
