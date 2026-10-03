@@ -30,7 +30,7 @@
     "@angular/cli": "latest",
     "@angular/compiler-cli": "latest",
     "jsdom": "latest",
-    "typescript": "latest",
+    "typescript": ">=6.0 <6.1",
     "vite": "latest",
     "vitest": "latest"
   }

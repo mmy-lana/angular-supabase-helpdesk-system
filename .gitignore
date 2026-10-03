@@ -30,3 +30,5 @@ Thumbs.db
 coverage/
 
 repomix-output.xml
+# pnpm
+.pnpm-store/
