@@ -1,0 +1,66 @@
+:root {
+  --zd-green-primary: #03363D;
+  --zd-green-action: #138A04;
+  --zd-green-action-hover: #107203;
+  --zd-yellow-bg: #FFF8E7;
+  --zd-yellow-border: #FAD160;
+  --zd-yellow-text: #704A00;
+  --zd-canvas: #F8F9F9;
+  --zd-surface: #FFFFFF;
+  --zd-border: #D8DCDE;
+  --zd-border-subtle: #E9EBED;
+  --zd-text-main: #2F3941;
+  --zd-text-secondary: #68737D;
+  --zd-text-muted: #87929D;
+  --zd-danger: #CC3340;
+  --zd-danger-bg: #FFF0F1;
+  --zd-blue: #1F73B7;
+  --zd-blue-bg: #EDF7FF;
+  --zd-focus-ring: rgba(31, 115, 183, 0.4);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100dvh;
+  min-height: 100dvh;
+  background-color: var(--zd-canvas);
+  color: var(--zd-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--zd-text-main);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--zd-blue);
+  outline-offset: 1px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

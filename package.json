@@ -1,0 +1,37 @@
+{
+  "name": "angular-supabase-helpdesk-system",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "build:demo": "ng build --configuration demo",
+    "watch": "ng build --watch --configuration development",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@angular/animations": "latest",
+    "@angular/cdk": "latest",
+    "@angular/common": "latest",
+    "@angular/compiler": "latest",
+    "@angular/core": "latest",
+    "@angular/forms": "latest",
+    "@angular/platform-browser": "latest",
+    "@angular/router": "latest",
+    "@supabase/supabase-js": "latest",
+    "rxjs": "latest",
+    "tslib": "latest"
+  },
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "latest",
+    "@angular-devkit/build-angular": "latest",
+    "@angular/cli": "latest",
+    "@angular/compiler-cli": "latest",
+    "jsdom": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}
